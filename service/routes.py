@@ -11,10 +11,28 @@ from service.models import Order, Item
 # Import Flask application
 from . import app
 
+
+######################################################################
+# GET INDEX
+######################################################################
+@app.route("/")
+def index():
+    """ Root URL response """
+    app.logger.info("Request for Root URL")
+    return (
+        jsonify(
+            name="Order REST API Service",
+            version="1.0",
+            # should move after we have order
+            # paths=url_for("list_orders", _external=True),
+        ),
+        status.HTTP_200_OK,
+    )
+
+
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
-
 
 def check_content_type(media_type):
     """Checks that the media type is correct"""

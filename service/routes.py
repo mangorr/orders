@@ -12,23 +12,6 @@ from service.models import Order, Item
 from . import app
 
 ######################################################################
-# GET INDEX
-######################################################################
-@app.route("/")
-def index():
-    """ Root URL response """
-    app.logger.info("Request for Root URL")
-    return (
-        jsonify(
-            name="Order REST API Service",
-            version="1.0",
-            paths=url_for("list_orders", _external=True),
-        ),
-        status.HTTP_200_OK,
-    )
-
-
-######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
 
@@ -41,5 +24,5 @@ def check_content_type(media_type):
     app.logger.error("Invalid Content-Type: %s", content_type)
     abort(
         status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
-        "Content-Type must be {}".format(media_type),
+        f"Content-Type must be {media_type}"
     )

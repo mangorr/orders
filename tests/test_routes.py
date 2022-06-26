@@ -12,6 +12,7 @@ Test cases can be run with the following:
 
 import os
 import logging
+import random
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 from service import app
@@ -21,6 +22,10 @@ from service.utils import status  # HTTP Status Codes
 
 BASE_URL = "/orders"
 
+DATABASE_URI = os.getenv(
+    "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/postgres"
+)
+
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
@@ -29,31 +34,37 @@ class Test(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        """ This runs once before the entire test suite """
-        pass
+        """Run once before all tests"""
+        app.config["TESTING"] = True
+        app.config["DEBUG"] = False
+        app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
+        app.logger.setLevel(logging.CRITICAL)
+        init_db(app)
 
     @classmethod
     def tearDownClass(cls):
-        """ This runs once after the entire test suite """
+        """Runs once before test suite"""
         pass
 
     def setUp(self):
-        """ This runs before each test """
+        """Runs before each test"""
+        db.session.query(Order).delete()  # clean up the last tests
+        db.session.commit()
         self.app = app.test_client()
 
     def tearDown(self):
-        """ This runs after each test """
-        pass
+        """Runs once after each test case"""
+        db.session.remove()
 
     ######################################################################
     #  H E L P E R   M E T H O D S
     ######################################################################
-
+    
     def _create_orders(self, count):
         """Factory method to create orders in bulk"""
         orders = []
         for _ in range(count):
-            order = OrderFactory()
+            order = OrderFactory() 
             resp = self.app.post(BASE_URL, json=order.serialize())
             self.assertEqual(
                 resp.status_code,
@@ -68,8 +79,3 @@ class Test(TestCase):
     ######################################################################
     #  P L A C E   T E S T   C A S E S   H E R E
     ######################################################################
-
-    def test_index(self):
-        """ It should call the home page """
-        resp = self.app.get("/")
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)

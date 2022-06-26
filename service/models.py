@@ -9,6 +9,7 @@ import logging
 from enum import Enum
 from statistics import quantiles
 from datetime import datetime
+from dotenv import set_key
 from flask_sqlalchemy import SQLAlchemy
 
 logger = logging.getLogger("flask.app")
@@ -19,7 +20,7 @@ db = SQLAlchemy()
 
 class DataValidationError(Exception):
     """ Used for an data validation errors when deserializing """
-    pass
+
 
 
 ######################################################################
@@ -46,11 +47,14 @@ class OrderStatus(Enum):
 class PersistentBase:
     """Base class added persistent methods"""
 
+    def __init__(self):
+        self.id = None  # pylint: disable=invalid-name
+
     def create(self):
         """
         Creates an Order/Item to the database
         """
-        logger.info("Creating %s", self.name)
+        logger.info("Creating %s", self.id)
         self.id = None  # id must be none to generate next primary key
         db.session.add(self)
         db.session.commit()
@@ -59,12 +63,12 @@ class PersistentBase:
         """
         Updates an Order/Item to the database
         """
-        logger.info("Updating %s", self.name)
+        logger.info("Updating %s", self.id)
         db.session.commit()
 
     def delete(self):
         """Removes an Order/Item from the database"""
-        logger.info("Deleting %s", self.name)
+        logger.info("Deleting %s", self.id)
         db.session.delete(self)
         db.session.commit()
 
@@ -106,6 +110,7 @@ class Item(db.Model, PersistentBase):
     """
     Class that represents an item
     """
+    APP = None
 
     # Table Schema
     id = db.Column(db.Integer, primary_key=True)
@@ -113,20 +118,13 @@ class Item(db.Model, PersistentBase):
     product_id = db.Column(db.Integer, nullable=False)
     quantity = db.Column(db.Integer, nullable=False, default=1)
     price = db.Column(db.Float, nullable=False)
+    order = db.relationship('Order', back_populates='order_items')
 
     def __repr__(self):
-        return "<Item %s id=[%s] order[%s]>" % (
-            self.product_id,
-            self.id,
-            self.order_id,
-        )
+        return f"<Item {self.product_id} id=[{self.id}] order[{self.order_id}]>"
 
     def __str__(self):
-        return "Item %s: %s, %s" % (
-            self.product_id,
-            self.quantity,
-            self.price
-        )
+        return f"Item {self.product_id}: {self.quantity}, {self.price}$"
 
     def serialize(self):
         """Serializes an item into a dictionary"""
@@ -145,11 +143,7 @@ class Item(db.Model, PersistentBase):
             data (dict): A dictionary containing the Item data
         """
         try:
-            if "id" in data:
-                self.id = data["id"]
-            if "order_id" in data:
-                self.order_id = data["order_id"]
-
+            self.order_id = data["order_id"]
             self.product_id = data["product_id"]
             self.quantity = data["quantity"]
             self.price = data["price"]
@@ -163,11 +157,11 @@ class Item(db.Model, PersistentBase):
                 raise DataValidationError("Invalid order: invalid price")
 
         except KeyError as error:
-            raise DataValidationError("Invalid Item: missing " + error.args[0])
+            raise DataValidationError("Invalid Item: missing " + error.args[0]) from error
         except TypeError as error:
             raise DataValidationError(
                 "Invalid Item: body of request contained bad or no data " + error.args[0]
-            )
+            ) from error
         return self
 
 
@@ -190,11 +184,11 @@ class Order(db.Model, PersistentBase):
     status = db.Column(
         db.Enum(OrderStatus), nullable=False, server_default=(OrderStatus.PLACED.name)
     )
-    order_items = db.relationship('Item', backref='order', cascade="all, delete", lazy=True)
+    order_items = db.relationship('Item', back_populates='order', passive_deletes=True)
 
 
     def __repr__(self):
-        return "<Order %r: Customer_id=[%s], Tracking_id=[%s], Status=[%s], items_number=[%s]>" % (self.id, self.customer_id, self.tracking_id, self.status, len(self.order_items))
+        return f"<Order {self.id}: Customer_id=[{self.customer_id}], Tracking_id=[{self.tracking_id}], Status=[{self.status}], items_number=[{len(self.order_items)}]>"
 
     def serialize(self):
         """Serializes an order into a dictionary"""
@@ -211,6 +205,8 @@ class Order(db.Model, PersistentBase):
             "order_items": items
         }
 
+        return account
+
     def deserialize(self, data):
         """
         Deserializes an order from a dictionary
@@ -218,29 +214,30 @@ class Order(db.Model, PersistentBase):
             data (dict): A dictionary containing the order data
         """
         try:
+            if "id" in data:
+                self.id = data["id"]
+
             self.customer_id = data["customer_id"]
             if self.customer_id is None or not isinstance(self.customer_id, int):
-                raise DataValidationError("Customer Id must be integer")
-           
+                raise DataValidationError("Customer Id must be integer")   
+
             self.tracking_id = data["tracking_id"]
             if self.tracking_id is None or not isinstance(self.tracking_id, int):
                 raise DataValidationError("Tracking Id must be integer")
             
             self.status = getattr(OrderStatus, data["status"])
-
-            if data["items"] is None or len(data["items"]) == 0:
-                raise DataValidationError("Order Items can't be empty")
-            self.items = []
-            for item in data["items"]:
-                self.items.append(
+   
+            self.order_items = []    
+            for item in data["order_items"]:
+                self.order_items.append(
                     Item().deserialize(item))
-            
+
         except KeyError as error:
-            raise DataValidationError("Invalid Account: missing " + error.args[0])
+            raise DataValidationError("Invalid Account: missing " + error.args[0]) from error
         except TypeError as error:
             raise DataValidationError(
                 "Invalid Account: body of request contained bad or no data - " + error.args[0]
-            )
+            ) from error
         return self
 
     @classmethod

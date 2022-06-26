@@ -5,8 +5,14 @@ Test cases for Order Model
 import os
 import logging
 import unittest
-from service.models import Order, Item, DataValidationError, db
+import random
+from service import app
+from service.models import Order, Item, DataValidationError, db, OrderStatus
 from tests.factories import OrderFactory, ItemFactory
+
+DATABASE_URI = os.getenv(
+    "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/postgres"
+)
 
 ######################################################################
 #  Order   M O D E L   T E S T   C A S E S
@@ -17,7 +23,11 @@ class TestOrder(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """ This runs once before the entire test suite """
-        pass
+        app.config["TESTING"] = True
+        app.config["DEBUG"] = False
+        app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
+        app.logger.setLevel(logging.CRITICAL)
+        Order.init_db(app)
 
     @classmethod
     def tearDownClass(cls):
@@ -26,14 +36,14 @@ class TestOrder(unittest.TestCase):
 
     def setUp(self):
         """ This runs before each test """
-        pass
+        db.session.query(Order).delete()  # clean up the last tests
+        db.session.commit()
 
     def tearDown(self):
         """ This runs after each test """
-        pass
+        db.session.remove()
+        
 
     ######################################################################
     #  T E S T   C A S E S
     ######################################################################
-
-    

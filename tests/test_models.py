@@ -1,17 +1,18 @@
 """
-Test cases for YourResourceModel Model
+Test cases for Order Model
 
 """
 import os
 import logging
 import unittest
-from service.models import YourResourceModel, DataValidationError, db
+from service.models import Order, Item, DataValidationError, db
+from tests.factories import OrderFactory, ItemFactory
 
 ######################################################################
-#  <your resource name>   M O D E L   T E S T   C A S E S
+#  Order   M O D E L   T E S T   C A S E S
 ######################################################################
-class TestYourResourceModel(unittest.TestCase):
-    """ Test Cases for YourResourceModel Model """
+class TestOrder(unittest.TestCase):
+    """ Test Cases for Order Model """
 
     @classmethod
     def setUpClass(cls):
@@ -35,6 +36,4 @@ class TestYourResourceModel(unittest.TestCase):
     #  T E S T   C A S E S
     ######################################################################
 
-    def test_XXXX(self):
-        """ It should always be true """
-        self.assertTrue(True)
+    

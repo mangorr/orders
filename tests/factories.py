@@ -251,3 +251,51 @@ class Order(db.Model, PersistentBase):
         """
         logger.info("Processing customer query for %d ...", customer_id)
         return cls.query.filter(cls.customer_id == customer_id).all()
+
+"""
+Test Factory to make fake objects for testing
+"""
+from ast import Or
+from telnetlib import STATUS
+import factory
+import random
+from datetime import date, datetime
+from factory.fuzzy import FuzzyChoice, FuzzyDate
+from itsdangerous import Serializer
+
+class ItemFactory(factory.Factory):
+    """Creates fake Items"""
+
+    class Meta:
+        model = Item
+
+    id = factory.Sequence(lambda n: n)
+    quantity = random.uniform(0, 100000)
+    price = random.uniform(0, 100000)
+    def __init__(self, order_id=1, id = 0, product_id=1):
+        self.order_id = order_id
+        self.id = id
+        self.product_id = product_id
+
+class OrderFactory(factory.Factory):
+    """Creates fake Orders"""
+
+    class Meta:
+        model = Order
+
+    id = factory.Sequence(lambda n: n)
+    customer_id = random.randint(0, 10000000)
+    tracking_id = random.randint(0, 10000000)
+    status = FuzzyChoice(OrderStatus)
+    # Thus next line doesn't seem to work :(
+    order_items = []
+
+
+if __name__ == "__main__":
+    # how to use in test API
+    order = OrderFactory()
+    order_items = []
+    for i in range(5):
+        order_items.append(ItemFactory(order_id=order.id, id=i, product_id=random.randint(0,10000000)))
+    order.order_items = order_items
+    print(order_items)

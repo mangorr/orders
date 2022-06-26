@@ -27,6 +27,69 @@ def index():
         status.HTTP_200_OK,
     )
 
+# ---------------------------------------------------------------------
+#                O R D E R   M E T H O D S
+# ---------------------------------------------------------------------
+
+
+######################################################################
+# LIST ALL ORDERS OR BY CUSTOMER_ID
+######################################################################
+@app.route("/orders", methods=["GET"])
+def list_orders():
+    """Returns all of the Orders"""
+    app.logger.info("Request for order list")
+    orders = []
+    customer_id = request.args.get("customer_id")
+    if customer_id:
+        orders = Order.find_by_customer(int(customer_id))
+    else:
+        orders = Order.all()
+
+    results = [order.serialize() for order in orders]
+    return make_response(jsonify(results), status.HTTP_200_OK)
+
+
+######################################################################
+# RETRIEVE AN ACCOUNT
+######################################################################
+@app.route("/orders/<int:order_id>", methods=["GET"])
+def get_orders(order_id):
+    """
+    Retrieve a single Order
+    This endpoint will return an Order based on it's id
+    """
+    app.logger.info("Request for Order with id: %s", order_id)
+    order = Order.find(order_id)
+    if not order:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Order with id '{order_id}' could not be found.",
+        )
+
+    return make_response(jsonify(order.serialize()), status.HTTP_200_OK)
+
+
+######################################################################
+# CREATE A NEW ORDER
+######################################################################
+@app.route("/orders", methods=["POST"])
+def create_orders():
+    """
+    Creates an Order
+    This endpoint will create an Order based the data in the body that is posted
+    """
+    app.logger.info("Request to create an Order")
+    check_content_type("application/json")
+    order = Order()
+    order.deserialize(request.get_json())
+    order.create()
+    message = order.serialize()
+    location_url = url_for("get_orders", order_id=order.id, _external=True)
+    return make_response(
+        jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
+    )
+
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
@@ -41,5 +104,5 @@ def check_content_type(media_type):
     app.logger.error("Invalid Content-Type: %s", content_type)
     abort(
         status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
-        "Content-Type must be {}".format(media_type),
+        f"Content-Type must be {media_type}"
     )

@@ -160,3 +160,17 @@ class TestOrder(unittest.TestCase):
         new_order = Order.find(order.id)
         self.assertEqual(len(new_order.order_items), 2)
         self.assertEqual(new_order.order_items[1].id, item2.id)
+
+    def test_read_item(self):
+        """It should Read an item"""
+        order = OrderFactory()
+        item = ItemFactory(order=order)
+        order.create()
+
+        # Read it back
+        found_item = Item.find(item.id)
+        self.assertEqual(found_item.id, item.id)
+        self.assertEqual(found_item.order_id, order.id)
+        self.assertEqual(found_item.product_id, item.product_id)
+        self.assertEqual(found_item.quantity, item.quantity)
+        self.assertEqual(found_item.price, item.price)

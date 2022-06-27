@@ -104,6 +104,7 @@ class Test(TestCase):
         self.assertEqual(new_order["tracking_id"], order.tracking_id, "Tracking Id does not match")
         self.assertEqual(new_order["status"], order.status.name, "Status does not match")
         self.assertEqual(len(new_order["order_items"]), len(order.order_items), "Items does not match")
+
         # Check that the location header was correct by getting it
         resp = self.app.get(location, content_type="application/json")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -122,21 +123,23 @@ class Test(TestCase):
 
         self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
-    def test_create_orders_customer_id_missing(self):
-        """ Create an order missing customer_id """
-        order = OrderFactory()
-        order.customer_id = None
-        resp = self.app.post('/orders',
-                             json=order.serialize(),
-                             content_type='application/json')
+    ######################################################################
+    #  A D D R E S S   T E S T   C A S E S
+    ######################################################################
 
-        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
-
-    def test_create_orders_customer_id_wrong_type(self):
-        """ Create an order with invalid customer_id """
-        order = OrderFactory()
-        order.customer_id = "string"
-        resp = self.app.post('/orders',
-                             json=order.serialize(),
-                             content_type='application/json')
-        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+    def test_add_item(self):
+        """It should Add an item to an order"""
+        order = self._create_orders(1)[0]
+        item = ItemFactory()
+        resp = self.app.post(
+            f"{BASE_URL}/{order.id}/items",
+            json=item.serialize(),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        data = resp.get_json()
+        logging.debug(data)
+        self.assertEqual(data["order_id"], order.id)
+        self.assertEqual(data["product_id"], item.product_id)
+        self.assertEqual(data["quantity"], item.quantity)
+        self.assertEqual(data["price"], item.price)

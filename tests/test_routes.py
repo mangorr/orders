@@ -85,3 +85,58 @@ class Test(TestCase):
         resp = self.app.get("/")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertIn(b'Order REST API Service', resp.data)
+
+    def test_create_order(self):
+        """It should Create a new Order"""
+        order = OrderFactory()
+        resp = self.app.post(
+            BASE_URL, json=order.serialize(), content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # Make sure location header is set
+        location = resp.headers.get("Location", None)
+        self.assertIsNotNone(location)
+
+        # Check the data is correct
+        new_order = resp.get_json()
+        self.assertEqual(new_order["customer_id"], order.customer_id, "Customer Id does not match")
+        self.assertEqual(new_order["tracking_id"], order.tracking_id, "Tracking Id does not match")
+        self.assertEqual(new_order["status"], order.status.name, "Status does not match")
+        self.assertEqual(len(new_order["order_items"]), len(order.order_items), "Items does not match")
+        # Check that the location header was correct by getting it
+        resp = self.app.get(location, content_type="application/json")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        new_order = resp.get_json()
+        self.assertEqual(new_order["customer_id"], order.customer_id, "Customer Id does not match")
+        self.assertEqual(new_order["tracking_id"], order.tracking_id, "Tracking Id does not match")
+        self.assertEqual(new_order["status"], order.status.name, "Status does not match")
+        self.assertEqual(new_order["order_items"], order.order_items, "Items does not match")
+
+    def test_create_orders_wrong_content_type(self):
+        """ Create an order with wrong content type """
+        order = OrderFactory()
+        resp = self.app.post('/orders',
+                             json=order.serialize(),
+                             content_type='application/xml')
+
+        self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
+    def test_create_orders_customer_id_missing(self):
+        """ Create an order missing customer_id """
+        order = OrderFactory()
+        order.customer_id = None
+        resp = self.app.post('/orders',
+                             json=order.serialize(),
+                             content_type='application/json')
+
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_orders_customer_id_wrong_type(self):
+        """ Create an order with invalid customer_id """
+        order = OrderFactory()
+        order.customer_id = "string"
+        resp = self.app.post('/orders',
+                             json=order.serialize(),
+                             content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)

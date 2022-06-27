@@ -47,3 +47,28 @@ class TestOrder(unittest.TestCase):
     ######################################################################
     #  T E S T   C A S E S
     ######################################################################
+
+    def test_create_an_order(self):
+        """It should Create an Order and assert that it exists"""
+        fake_order = OrderFactory()
+        order = Order(
+            customer_id=fake_order.customer_id,
+            tracking_id=fake_order.tracking_id,
+            status=fake_order.status,
+        )
+        self.assertIsNotNone(order)
+        self.assertEqual(order.id, None)
+        self.assertEqual(order.customer_id, fake_order.customer_id)
+        self.assertEqual(order.tracking_id, fake_order.tracking_id)
+        self.assertEqual(order.status, fake_order.status)
+
+    def test_add_an_order(self):
+        """It should Create an order and add it to the database"""
+        orders = Order.all()
+        self.assertEqual(orders, [])
+        order = OrderFactory()
+        order.create()
+        # Assert that it was assigned an id and shows up in the database
+        self.assertIsNotNone(order.id)
+        orders = Order.all()
+        self.assertEqual(len(orders), 1)

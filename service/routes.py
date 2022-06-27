@@ -56,6 +56,7 @@ def list_orders():
 def create_orders():
     """
     Creates an Order
+    
     This endpoint will create an Order based the data in the body that is posted
     """
     app.logger.info("Request to create an Order")
@@ -76,6 +77,7 @@ def create_orders():
 def get_orders(order_id):
     """
     Retrieve a single Order
+
     This endpoint will return an Order based on it's id
     """
     app.logger.info("Request for Order with id: %s", order_id)

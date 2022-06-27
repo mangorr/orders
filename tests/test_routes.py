@@ -123,6 +123,22 @@ class Test(TestCase):
 
         self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
+    def test_get_order(self):
+        """It should Read a single Order"""
+        # get the id of an order
+        order = self._create_orders(1)[0]
+        resp = self.app.get(
+            f"{BASE_URL}/{order.id}", content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(data["id"], order.id)
+
+    def test_get_order_not_found(self):
+        """It should not Read an Order that is not found"""
+        resp = self.app.get(f"{BASE_URL}/0")
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+    
     def test_get_order_list(self):
         """ It should List orders """
         resp = self.app.get(BASE_URL)
@@ -146,7 +162,7 @@ class Test(TestCase):
         self.assertEqual(data[0]["customer_id"], orders[1].customer_id)
 
     ######################################################################
-    #  I T E M S  T E S T   C A S E S
+    #  I T E M  T E S T   C A S E S
     ######################################################################
 
     def test_add_item(self):
@@ -166,6 +182,36 @@ class Test(TestCase):
         self.assertEqual(data["quantity"], item.quantity)
         self.assertEqual(data["price"], item.price)
 
+    def test_get_item(self):
+        """It should Get an item from an order"""
+        # create a known address
+        order = self._create_orders(1)[0]
+        item = ItemFactory()
+        resp = self.app.post(
+            f"{BASE_URL}/{order.id}/items",
+            json=item.serialize(),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        data = resp.get_json()
+        logging.debug(data)
+        item_id = data["id"]
+
+        # retrieve it back
+        resp = self.app.get(
+            f"{BASE_URL}/{order.id}/items/{item_id}",
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        data = resp.get_json()
+        logging.debug(data)
+        self.assertEqual(data["order_id"], order.id)
+        self.assertEqual(data["product_id"], item.product_id)
+        self.assertEqual(data["quantity"], item.quantity)
+        self.assertEqual(data["price"], item.price)
+    
     def test_get_item_list(self):
         """It should Get a list of Items"""
         # add two items to order

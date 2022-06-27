@@ -73,6 +73,39 @@ class TestOrder(unittest.TestCase):
         orders = Order.all()
         self.assertEqual(len(orders), 1)
 
+    def test_read_order(self):
+        """It should Read an order"""
+        order = OrderFactory()
+        order.create()
+
+        # Read it back
+        found_order = Order.find(order.id)
+        self.assertEqual(found_order.id, order.id)
+        self.assertEqual(found_order.customer_id, order.customer_id)
+        self.assertEqual(found_order.tracking_id, order.tracking_id)
+        self.assertEqual(found_order.created_time, order.created_time)
+        self.assertEqual(found_order.status, order.status)
+        self.assertEqual(found_order.order_items, [])
+
+    def test_list_all_orders(self):
+        """It should List all Orders in the database"""
+        orders = Order.all()
+        # self.assertEqual(orders, [])
+        for order in OrderFactory.create_batch(3):
+            order.create()
+        # Assert that there are not 3 orders in the database
+        orders = Order.all()
+        self.assertEqual(len(orders), 3)
+
+    def test_find_list_by_customer_id(self):
+        """It should Find an Order by customer_id"""
+        order = OrderFactory()
+        order.create()
+        # Fetch it from database by customer_id
+        same_order = Order.find_by_customer(order.customer_id)[0]
+        self.assertEqual(same_order.id, order.id)
+        self.assertEqual(same_order.customer_id, order.customer_id)
+
     def test_serialize_an_order(self):
         """It should Serialize an order"""
         order = OrderFactory()
@@ -91,7 +124,6 @@ class TestOrder(unittest.TestCase):
         self.assertEqual(items[0]["product_id"], item.product_id)
         self.assertEqual(items[0]["quantity"], item.quantity)
         self.assertEqual(items[0]["price"], item.price)
-
 
     def test_deserialize_an_order(self):
         """It should Deserialize an order"""
@@ -148,21 +180,16 @@ class TestOrder(unittest.TestCase):
         self.assertEqual(len(new_order.order_items), 2)
         self.assertEqual(new_order.order_items[1].id, item2.id)
 
-    def test_list_all_orders(self):
-        """It should List all Orders in the database"""
-        orders = Order.all()
-        # self.assertEqual(orders, [])
-        for order in OrderFactory.create_batch(3):
-            order.create()
-        # Assert that there are not 3 orders in the database
-        orders = Order.all()
-        self.assertEqual(len(orders), 3)
-
-    def test_find_list_by_customer_id(self):
-        """It should Find an Order by customer_id"""
+    def test_read_order_item(self):
+        """It should Read an item"""
         order = OrderFactory()
+        item = ItemFactory(order=order)
         order.create()
-        # Fetch it from database by customer_id
-        same_order = Order.find_by_customer(order.customer_id)[0]
-        self.assertEqual(same_order.id, order.id)
-        self.assertEqual(same_order.customer_id, order.customer_id)
+
+        # Read it back
+        found_item = Item.find(item.id)
+        self.assertEqual(found_item.id, item.id)
+        self.assertEqual(found_item.order_id, order.id)
+        self.assertEqual(found_item.product_id, item.product_id)
+        self.assertEqual(found_item.quantity, item.quantity)
+        self.assertEqual(found_item.price, item.price)

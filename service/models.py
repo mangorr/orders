@@ -104,13 +104,12 @@ class PersistentBase:
 
 ######################################################################
 #  I T E M   M O D E L  
-#  Item: represents a product, it's quantity, and its price
+#  Item: represents a product with the quantity and its price
 ######################################################################
 class Item(db.Model, PersistentBase):
     """
     Class that represents an item
     """
-    APP = None
 
     # Table Schema
     id = db.Column(db.Integer, primary_key=True)

@@ -88,6 +88,59 @@ def get_orders(order_id):
 
     return make_response(jsonify(order.serialize()), status.HTTP_200_OK)
 
+
+# ---------------------------------------------------------------------
+#                I T E M   M E T H O D S
+# ---------------------------------------------------------------------
+
+
+######################################################################
+# LIST ITEMS
+######################################################################
+@app.route("/orders/<int:order_id>/items", methods=["GET"])
+def list_items(order_id):
+    """Returns all of the Items for an order"""
+    app.logger.info("Request for all Items for Order with id: %s", order_id)
+
+    order = Order.find(order_id)
+    if not order:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Order with id '{order_id}' could not be found.",
+        )
+
+    results = [item.serialize() for item in order.order_items]
+    return make_response(jsonify(results), status.HTTP_200_OK)
+
+
+######################################################################
+# ADD AN ITEM TO AN ORDER
+######################################################################
+@app.route("/orders/<int:order_id>/items", methods=["POST"])
+def create_items(order_id):
+    """
+    Create an Item on an Order
+
+    This endpoint will add an item to an order
+    """
+    app.logger.info("Request to create an Item for Order with id: %s", order_id)
+    check_content_type("application/json")
+
+    order = Order.find(order_id)
+    if not order:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Order with id '{order_id}' could not be found.",
+        )
+
+    item = Item()
+    item.deserialize(request.get_json())
+    order.order_items.append(item)
+    order.update()
+    message = item.serialize()
+    return make_response(jsonify(message), status.HTTP_201_CREATED)
+
+
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################

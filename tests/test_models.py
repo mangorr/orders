@@ -124,3 +124,26 @@ class TestOrder(unittest.TestCase):
         """It should not Deserialize an item with a TypeError"""
         item = Item()
         self.assertRaises(DataValidationError, item.deserialize, [])
+    
+    def test_add_order_item(self):
+        """It should Create an item with an order and add it to the database"""
+        orders = Order.all()
+        self.assertEqual(orders, [])
+        order = OrderFactory()
+        item = ItemFactory(order=order)
+        order.create()
+        # Assert that it was assigned an id and shows up in the database
+        self.assertIsNotNone(order.id)
+        orders = Order.all()
+        self.assertEqual(len(orders), 1) 
+
+        new_order = Order.find(order.id)
+        self.assertEqual(new_order.order_items[0].id, item.id)
+
+        item2 = ItemFactory()
+        order.order_items.append(item2)
+        order.update()
+
+        new_order = Order.find(order.id)
+        self.assertEqual(len(new_order.order_items), 2)
+        self.assertEqual(new_order.order_items[1].id, item2.id)

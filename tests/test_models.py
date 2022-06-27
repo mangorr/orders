@@ -32,7 +32,7 @@ class TestOrder(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         """ This runs once after the entire test suite """
-        pass
+        db.session.close()
 
     def setUp(self):
         """ This runs before each test """
@@ -72,3 +72,55 @@ class TestOrder(unittest.TestCase):
         self.assertIsNotNone(order.id)
         orders = Order.all()
         self.assertEqual(len(orders), 1)
+
+    def test_serialize_an_order(self):
+        """It should Serialize an order"""
+        order = OrderFactory()
+        item = ItemFactory(order=order)
+        order.create()
+
+        serial_order = order.serialize()
+        self.assertEqual(serial_order["id"], order.id)
+        self.assertEqual(serial_order["customer_id"], order.customer_id)
+        self.assertEqual(serial_order["tracking_id"], order.tracking_id)
+        self.assertEqual(serial_order["status"], order.status.name)
+        self.assertEqual(len(serial_order["order_items"]), 1)
+        items = serial_order["order_items"]
+        self.assertEqual(items[0]["id"], item.id)
+        self.assertEqual(items[0]["order_id"], item.order_id)
+        self.assertEqual(items[0]["product_id"], item.product_id)
+        self.assertEqual(items[0]["quantity"], item.quantity)
+        self.assertEqual(items[0]["price"], item.price)
+
+
+    def test_deserialize_an_order(self):
+        """It should Deserialize an order"""
+        order = OrderFactory()
+        order.order_items.append(ItemFactory())
+        order.create()
+        serial_order = order.serialize()
+        new_order = Order()
+        new_order.deserialize(serial_order)
+        self.assertEqual(new_order.customer_id, order.customer_id)
+        self.assertEqual(new_order.tracking_id, order.tracking_id)
+        self.assertEqual(new_order.status, order.status)
+
+    def test_deserialize_with_key_error(self):
+        """It should not Deserialize an order with a KeyError"""
+        order = Order()
+        self.assertRaises(DataValidationError, order.deserialize, {})
+
+    def test_deserialize_with_type_error(self):
+        """It should not Deserialize an order with a TypeError"""
+        order = Order()
+        self.assertRaises(DataValidationError, order.deserialize, [])
+
+    def test_deserialize_item_key_error(self):
+        """It should not Deserialize an item with a KeyError"""
+        item = Item()
+        self.assertRaises(DataValidationError, item.deserialize, {})
+
+    def test_deserialize_item_type_error(self):
+        """It should not Deserialize an item with a TypeError"""
+        item = Item()
+        self.assertRaises(DataValidationError, item.deserialize, [])

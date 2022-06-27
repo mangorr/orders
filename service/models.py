@@ -118,7 +118,6 @@ class Item(db.Model, PersistentBase):
     product_id = db.Column(db.Integer, nullable=False)
     quantity = db.Column(db.Integer, nullable=False, default=1)
     price = db.Column(db.Float, nullable=False)
-    order = db.relationship('Order', back_populates='order_items')
 
     def __repr__(self):
         return f"<Item {self.product_id} id=[{self.id}] order[{self.order_id}]>"
@@ -147,14 +146,6 @@ class Item(db.Model, PersistentBase):
             self.product_id = data["product_id"]
             self.quantity = data["quantity"]
             self.price = data["price"]
-            
-            if self.product_id is None or not isinstance(self.product_id, int):
-                raise DataValidationError("Invalid order: invalid product ID")
-            if self.quantity is None or not isinstance(self.quantity, int):
-                raise DataValidationError("Invalid order: invalid quantity")
-            if self.price is None or \
-                    (not isinstance(self.price, float) and not isinstance(self.price, int)):
-                raise DataValidationError("Invalid order: invalid price")
 
         except KeyError as error:
             raise DataValidationError("Invalid Item: missing " + error.args[0]) from error
@@ -184,7 +175,7 @@ class Order(db.Model, PersistentBase):
     status = db.Column(
         db.Enum(OrderStatus), nullable=False, server_default=(OrderStatus.PLACED.name)
     )
-    order_items = db.relationship('Item', back_populates='order', passive_deletes=True)
+    order_items = db.relationship('Item', backref='order', passive_deletes=True)
 
 
     def __repr__(self):
@@ -196,7 +187,7 @@ class Order(db.Model, PersistentBase):
         for item in self.order_items:
             items.append(Item.serialize(item))
 
-        account = {
+        order = {
             "id": self.id,
             "customer_id": self.customer_id,
             "tracking_id": self.tracking_id,
@@ -205,7 +196,7 @@ class Order(db.Model, PersistentBase):
             "order_items": items
         }
 
-        return account
+        return order
 
     def deserialize(self, data):
         """
@@ -217,14 +208,8 @@ class Order(db.Model, PersistentBase):
             if "id" in data:
                 self.id = data["id"]
 
-            self.customer_id = data["customer_id"]
-            if self.customer_id is None or not isinstance(self.customer_id, int):
-                raise DataValidationError("Customer Id must be integer")   
-
+            self.customer_id = data["customer_id"] 
             self.tracking_id = data["tracking_id"]
-            if self.tracking_id is None or not isinstance(self.tracking_id, int):
-                raise DataValidationError("Tracking Id must be integer")
-            
             self.status = getattr(OrderStatus, data["status"])
    
             self.order_items = []    

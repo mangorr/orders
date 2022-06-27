@@ -23,8 +23,7 @@ def index():
         jsonify(
             name="Order REST API Service",
             version="1.0",
-            # should move after we have order
-            # paths=url_for("list_orders", _external=True),
+            paths=url_for("list_orders", _external=True),
         ),
         status.HTTP_200_OK,
     )

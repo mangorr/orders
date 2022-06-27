@@ -138,9 +138,31 @@ class Test(TestCase):
         """It should not Read an Order that is not found"""
         resp = self.app.get(f"{BASE_URL}/0")
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+    
+    def test_get_order_list(self):
+        """ It should List orders """
+        resp = self.app.get(BASE_URL)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(len(data), 0)
+
+        # create three orders and name sure it appears in the list
+        self._create_orders(5)
+        resp = self.app.get(BASE_URL)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(len(data), 5)
+
+    def test_get_order_by_customer(self):
+        """It should Get an Order by customer_id"""
+        orders = self._create_orders(3)
+        resp = self.app.get(BASE_URL, query_string=f"customer_id={orders[1].customer_id}")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(data[0]["customer_id"], orders[1].customer_id)
 
     ######################################################################
-    #  A D D R E S S   T E S T   C A S E S
+    #  I T E M  T E S T   C A S E S
     ######################################################################
 
     def test_add_item(self):
@@ -189,3 +211,28 @@ class Test(TestCase):
         self.assertEqual(data["product_id"], item.product_id)
         self.assertEqual(data["quantity"], item.quantity)
         self.assertEqual(data["price"], item.price)
+    
+    def test_get_item_list(self):
+        """It should Get a list of Items"""
+        # add two items to order
+        order = self._create_orders(1)[0]
+        item_list = ItemFactory.create_batch(2)
+
+        # Create item 1
+        resp = self.app.post(
+            f"{BASE_URL}/{order.id}/items", json=item_list[0].serialize()
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # Create item 2
+        resp = self.app.post(
+            f"{BASE_URL}/{order.id}/items", json=item_list[1].serialize()
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # get the list back and make sure there are 2
+        resp = self.app.get(f"{BASE_URL}/{order.id}/items")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        data = resp.get_json()
+        self.assertEqual(len(data), 2)

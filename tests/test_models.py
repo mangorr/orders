@@ -87,6 +87,25 @@ class TestOrder(unittest.TestCase):
         self.assertEqual(found_order.status, order.status)
         self.assertEqual(found_order.order_items, [])
 
+    def test_list_all_orders(self):
+        """It should List all Orders in the database"""
+        orders = Order.all()
+        # self.assertEqual(orders, [])
+        for order in OrderFactory.create_batch(3):
+            order.create()
+        # Assert that there are not 3 orders in the database
+        orders = Order.all()
+        self.assertEqual(len(orders), 3)
+
+    def test_find_list_by_customer_id(self):
+        """It should Find an Order by customer_id"""
+        order = OrderFactory()
+        order.create()
+        # Fetch it from database by customer_id
+        same_order = Order.find_by_customer(order.customer_id)[0]
+        self.assertEqual(same_order.id, order.id)
+        self.assertEqual(same_order.customer_id, order.customer_id)
+
     def test_serialize_an_order(self):
         """It should Serialize an order"""
         order = OrderFactory()
@@ -161,7 +180,7 @@ class TestOrder(unittest.TestCase):
         self.assertEqual(len(new_order.order_items), 2)
         self.assertEqual(new_order.order_items[1].id, item2.id)
 
-    def test_read_item(self):
+    def test_read_order_item(self):
         """It should Read an item"""
         order = OrderFactory()
         item = ItemFactory(order=order)

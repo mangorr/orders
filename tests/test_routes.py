@@ -26,6 +26,8 @@ DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/postgres"
 )
 
+CONTENT_TYPE_JSON = "application/json"
+
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
@@ -135,15 +137,19 @@ class Test(TestCase):
         self.assertEqual(updated_order["tracking_id"], 8888)
         self.assertEqual(updated_order["status"], OrderStatus.CANCELLED.name)
 
-
     def test_create_orders_wrong_content_type(self):
-        """ Create an order with wrong content type """
+        """ It should not create an order with wrong content type """
         order = OrderFactory()
         resp = self.app.post('/orders',
                              json=order.serialize(),
                              content_type='application/xml')
 
         self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
+    def test_create_order_no_data(self):
+        """It should not Create an order with missing data"""
+        resp = self.app.post(BASE_URL, json={}, content_type=CONTENT_TYPE_JSON)
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_get_order(self):
         """It should Read a single Order"""
@@ -160,7 +166,7 @@ class Test(TestCase):
         """It should not Read an Order that is not found"""
         resp = self.app.get(f"{BASE_URL}/0")
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-    
+
     def test_get_order_list(self):
         """ It should List orders """
         resp = self.app.get(BASE_URL)

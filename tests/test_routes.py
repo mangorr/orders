@@ -146,7 +146,7 @@ class Test(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
     ######################################################################
-    #  A D D R E S S   T E S T   C A S E S
+    #  I T E M   T E S T   C A S E S
     ######################################################################
 
     def test_add_item(self):

@@ -73,6 +73,24 @@ class TestOrder(unittest.TestCase):
         orders = Order.all()
         self.assertEqual(len(orders), 1)
 
+    def test_update_order(self):
+        """It should Update an order"""
+        order = OrderFactory()
+        order.create()
+        # Assert that it was assigned an id and shows up in the database
+        self.assertIsNotNone(order.id)
+
+        # Fetch it back
+        order = Order.find(order.id)
+        order.tracking_id = 8888
+        order.status = OrderStatus.CANCELLED
+        order.update()
+
+        # Fetch it back again
+        order = Order.find(order.id)
+        self.assertEqual(order.tracking_id, 8888)
+        self.assertEqual(order.status.name, OrderStatus.CANCELLED.name)
+
     def test_serialize_an_order(self):
         """It should Serialize an order"""
         order = OrderFactory()
@@ -147,3 +165,36 @@ class TestOrder(unittest.TestCase):
         new_order = Order.find(order.id)
         self.assertEqual(len(new_order.order_items), 2)
         self.assertEqual(new_order.order_items[1].id, item2.id)
+
+    def test_update_order_item(self):
+        """It should Update an order item"""
+        orders = Order.all()
+        self.assertEqual(orders, [])
+
+        order = OrderFactory()
+        item = ItemFactory(order=order)
+        order.create()
+        # Assert that it was assigned an id and shows up in the database
+        self.assertIsNotNone(order.id)
+        orders = Order.all()
+        self.assertEqual(len(orders), 1)
+
+        # Fetch it back
+        order = Order.find(order.id)
+        old_item = order.order_items[0]
+        print("%r", old_item)
+        self.assertEqual(old_item.product_id, item.product_id)
+        self.assertEqual(old_item.quantity, item.quantity)
+        self.assertEqual(old_item.price, item.price)
+        # Change the product_id, quantity, price
+        old_item.product_id = 9999
+        old_item.quantity = 8888
+        old_item.price = 7777
+        order.update()
+
+        # Fetch it back again
+        order = Order.find(order.id)
+        item = order.order_items[0]
+        self.assertEqual(item.product_id, 9999)
+        self.assertEqual(item.quantity, 8888)
+        self.assertEqual(item.price, 7777)

@@ -70,7 +70,7 @@ def create_orders():
     )
 
 ######################################################################
-# RETRIEVE AN ACCOUNT
+# RETRIEVE AN ORDER
 ######################################################################
 @app.route("/orders/<int:order_id>", methods=["GET"])
 def get_orders(order_id):
@@ -88,6 +88,28 @@ def get_orders(order_id):
 
     return make_response(jsonify(order.serialize()), status.HTTP_200_OK)
 
+######################################################################
+# UPDATE AN EXISTING ORDER
+######################################################################
+@app.route("/orders/<int:order_id>", methods=["PUT"])
+def update_orders(order_id):
+    """
+    Update an Order
+    This endpoint will update an Order based the body that is posted
+    """
+    app.logger.info("Request to update Order with id: %s", order_id)
+    check_content_type("application/json")
+    order = Order.find(order_id)
+    if not order:
+        abort(
+            status.HTTP_404_NOT_FOUND, 
+            f"Order with id '{order_id}' was not found."
+        )
+
+    order.deserialize(request.get_json())
+    order.id = order_id
+    order.update()
+    return make_response(jsonify(order.serialize()), status.HTTP_200_OK)
 
 # ---------------------------------------------------------------------
 #                I T E M   M E T H O D S
@@ -140,6 +162,35 @@ def create_items(order_id):
     message = item.serialize()
     return make_response(jsonify(message), status.HTTP_201_CREATED)
 
+
+######################################################################
+# UPDATE A Item
+######################################################################
+@app.route("/orders/<int:order_id>/items/<int:item_id>", methods=["PUT"])
+def update_items(order_id, item_id):
+    """
+    Update an Item
+
+    This endpoint will update an Item based the body that is posted
+    """
+    app.logger.info(
+        "Request to update Item %s for Account id: %s", (item_id, order_id)
+    )
+    check_content_type("application/json")
+
+    item = Item.find(item_id)
+
+    if not item:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Account with id '{item_id}' could not be found.",
+        )
+
+    item.deserialize(request.get_json())
+    item.id = item_id
+    item.update()
+
+    return make_response(jsonify(item.serialize()), status.HTTP_200_OK)
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S

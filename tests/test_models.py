@@ -180,7 +180,8 @@ class TestOrder(unittest.TestCase):
         orders = Order.all()
         self.assertEqual(orders, [])
         order = OrderFactory()
-        item = ItemFactory(order=order)
+        item = ItemFactory()
+        order.order_items.append(item)
         order.create()
         # Assert that it was assigned an id and shows up in the database
         self.assertIsNotNone(order.id)
@@ -204,7 +205,8 @@ class TestOrder(unittest.TestCase):
         self.assertEqual(orders, [])
 
         order = OrderFactory()
-        item = ItemFactory(order=order)
+        item = ItemFactory()
+        order.order_items.append(item)
         order.create()
         # Assert that it was assigned an id and shows up in the database
         self.assertIsNotNone(order.id)
@@ -234,7 +236,8 @@ class TestOrder(unittest.TestCase):
     def test_read_order_item(self):
         """It should Read an item"""
         order = OrderFactory()
-        item = ItemFactory(order=order)
+        item = ItemFactory()
+        order.order_items.append(item)
         order.create()
 
         # Read it back

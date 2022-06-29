@@ -1,30 +1,54 @@
-# NYU DevOps Project Template
+# NYU DevOps - Orders
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Python](https://img.shields.io/badge/Language-Python-blue.svg)](https://python.org/)
 
-This is a skeleton you can use to start your projects
+### Introduction
+This repository maintains the back end for an eCommerce website as a RESTful microservices for the orders resource. An order is a collection of order items where each item represents a product, its quantity, and its price. The microservice supports the complete Create, Read, Update, & Delete (CRUD) lifecycle calls plus List.
 
 ## Overview
 
-This project template contains starter code for your class project. The `/service` folder contains your `models.py` file for your model and a `routes.py` file for your service. The `/tests` folder has test case starter code for testing the model and the service separately. All you need to do is add your functionality. You can use the [lab-flask-tdd](https://github.com/nyu-devops/lab-flask-tdd) for code examples to copy from.
+The `/service` folder contains `models.py` file for the model and a `routes.py` file for the service. The `/tests` folder has test cases for testing the model and the service separately.
 
-## Automatic Setup
-
-The best way to use this repo is to start your own repo using it as a git template. To do this just press the green **Use this template** button in GitHub and this will become the source for your repository.
-
-## Manual Setup
-
-You can also clone this repository and then copy and paste the starter code into your project repo folder on your local computer. Be careful not to copy over your own `README.md` file so be selective in what you copy.
-
-There are 4 hidden files that you will need to copy manually if you use the Mac Finder or Windows Explorer to copy files from this folder into your repo folder.
-
-These should be copied using a bash shell as follows:
+## Setup
+To bring up the development environment you should clone this repo, change into the repo directory:
 
 ```bash
-    cp .gitignore  ../<your_repo_folder>/
-    cp .flaskenv ../<your_repo_folder>/
-    cp .gitattributes ../<your_repo_folder>/
+$ git clone https://github.com/nyu-devops/lab-flask-tdd.git
+$ cd lab-flask-tdd
+```
+
+### Start developing with Visual Studio Code and Docker
+
+Open Visual Studio Code using the `code .` command. VS Code will prompt you to reopen in a container and you should say **yes**. This will take a while as it builds the Docker image and creates a container from it to develop in.
+
+```bash
+$ code .
+```
+
+## Running the tests
+Run the tests using `nosetests`
+
+```shell
+$ nosetests
+```
+
+Show the line numbers for the code that have not been covered
+
+```shell
+$ coverage report -m
+```
+
+Manually run `nosetests` with `coverage` (but `setup.cfg` does this already)
+
+```shell
+$ nosetests --with-coverage --cover-package=service
+```
+
+Check if the Python code follows the PEP8 standard
+
+```shell
+$ flake8 --count --max-complexity=10 --statistics service
 ```
 
 ## Contents
@@ -42,17 +66,41 @@ config.py           - configuration parameters
 
 service/                   - service python package
 ├── __init__.py            - package initializer
+├── config.py              - global configuration for application
 ├── models.py              - module with business models
 ├── routes.py              - module with service routes
 └── utils                  - utility package
+    ├── cli_commands.py    - explicit command to recreate the tables
     ├── error_handlers.py  - HTTP error handling code
     ├── log_handlers.py    - logging setup code
     └── status.py          - HTTP status constants
 
 tests/              - test cases package
 ├── __init__.py     - package initializer
+├── factories.py    - generate fake orders or items with factoryboy
 ├── test_models.py  - test suite for business models
 └── test_routes.py  - test suite for service routes
+```
+
+## Information about this repo
+
+These are the RESTful routes for `orders` and `items`
+```
+Endpoint          Methods  Rule
+----------------  -------  -----------------------------------------------------
+index             GET      /
+
+list_orders     GET      /orders
+create_orders   POST     /orders
+get_orders      GET      /orders/<int:order_id>
+update_orders   PUT      /orders/<int:order_id>
+delete_orders   DELETE   /orders/<int:order_id>
+
+list_items    GET      /orders/<int:order_id>/items
+create_items  POST     /orders/<int:order_id>/items
+get_items     GET      /orders/<int:order_id>/items/<int:item_id>
+update_items  PUT      /orders/<int:order_id>/items/<int:item_id>
+delete_items  DELETE   /orders/<int:order_id>/items/<int:item_id>
 ```
 
 ## License

@@ -137,6 +137,17 @@ class Test(TestCase):
         self.assertEqual(updated_order["tracking_id"], 8888)
         self.assertEqual(updated_order["status"], OrderStatus.CANCELLED.name)
 
+    def test_update_order_not_found(self):
+        """It should not Update an order that is not found"""
+        order = OrderFactory()
+        # order have not created yet
+        resp = self.app.put(
+            f"{BASE_URL}/{order.id}",
+            json=order.serialize(),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_delete_order(self):
         """It should Delete an Order"""
         # get the id of an order
@@ -173,6 +184,12 @@ class Test(TestCase):
         """It should not Read an Order that is not found"""
         resp = self.app.get(f"{BASE_URL}/0")
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_get_order_with_method_not_supported(self):
+        """It should not Read an Order with wrong method"""
+        # test for error_handlers
+        resp = self.app.post(f"{BASE_URL}/0")
+        self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def test_get_order_list(self):
         """ It should List orders """
@@ -216,6 +233,16 @@ class Test(TestCase):
         self.assertEqual(data["product_id"], item.product_id)
         self.assertEqual(data["quantity"], item.quantity)
         self.assertEqual(data["price"], item.price)
+
+    def test_add_item_to_order_not_found(self):
+        """It should not Add items to the Order that is not found"""
+        item = ItemFactory()
+        resp = self.app.post(
+            f"{BASE_URL}/0/items",
+            json=item.serialize(),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_get_item(self):
         """It should Get an item from an order"""
@@ -271,7 +298,12 @@ class Test(TestCase):
 
         data = resp.get_json()
         self.assertEqual(len(data), 2)
-        
+
+    def test_get_item_list_of_order_not_found(self):
+        """It should not List items of the Order that is not found"""
+        resp = self.app.get(f"{BASE_URL}/0/items")
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_update_item(self):
         """It should Update an item on an order"""
         # create a known item
@@ -315,6 +347,18 @@ class Test(TestCase):
         self.assertEqual(data["product_id"], 9999)
         self.assertEqual(data["quantity"], 8888)
         self.assertEqual(data["price"], 7777)
+
+    def test_update_item_not_found(self):
+        """It should not Update an item that is not found"""
+        order = self._create_orders(1)[0]
+        item = ItemFactory()
+        # item have not created yet
+        resp = self.app.put(
+            f"{BASE_URL}/{order.id}/items/{item.id}",
+            json=order.serialize(),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_delete_item(self):
         """It should Delete an Item"""

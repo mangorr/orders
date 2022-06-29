@@ -26,6 +26,8 @@ DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/postgres"
 )
 
+CONTENT_TYPE_JSON = "application/json"
+
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
@@ -135,6 +137,17 @@ class Test(TestCase):
         self.assertEqual(updated_order["tracking_id"], 8888)
         self.assertEqual(updated_order["status"], OrderStatus.CANCELLED.name)
 
+    def test_update_order_not_found(self):
+        """It should not Update an Order that is not found"""
+        order = OrderFactory()
+        # order have not created yet
+        resp = self.app.put(
+            f"{BASE_URL}/{order.id}",
+            json=order.serialize(),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_delete_order(self):
         """It should Delete an Order"""
         # get the id of an order
@@ -143,13 +156,18 @@ class Test(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_create_orders_wrong_content_type(self):
-        """ Create an order with wrong content type """
+        """ It should not Create an Order with wrong content type """
         order = OrderFactory()
         resp = self.app.post('/orders',
                              json=order.serialize(),
                              content_type='application/xml')
 
         self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
+    def test_create_order_no_data(self):
+        """It should not Create an Order with missing data"""
+        resp = self.app.post(BASE_URL, json={}, content_type=CONTENT_TYPE_JSON)
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_get_order(self):
         """It should Read a single Order"""
@@ -166,9 +184,15 @@ class Test(TestCase):
         """It should not Read an Order that is not found"""
         resp = self.app.get(f"{BASE_URL}/0")
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-    
+
+    def test_get_order_with_method_not_supported(self):
+        """It should not Read an Order with wrong method"""
+        # test for error_handlers
+        resp = self.app.post(f"{BASE_URL}/0")
+        self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
     def test_get_order_list(self):
-        """ It should List orders """
+        """ It should List Orders """
         resp = self.app.get(BASE_URL)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
@@ -194,7 +218,7 @@ class Test(TestCase):
     ######################################################################
 
     def test_add_item(self):
-        """It should Add an item to an order"""
+        """It should Add an Item to an order"""
         order = self._create_orders(1)[0]
         item = ItemFactory()
         resp = self.app.post(
@@ -210,8 +234,18 @@ class Test(TestCase):
         self.assertEqual(data["quantity"], item.quantity)
         self.assertEqual(data["price"], item.price)
 
+    def test_add_item_to_order_not_found(self):
+        """It should not Add Items to the order that is not found"""
+        item = ItemFactory()
+        resp = self.app.post(
+            f"{BASE_URL}/0/items",
+            json=item.serialize(),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_get_item(self):
-        """It should Get an item from an order"""
+        """It should Get an Item from an order"""
         # create a known items
         order = self._create_orders(1)[0]
         item = ItemFactory()
@@ -264,9 +298,14 @@ class Test(TestCase):
 
         data = resp.get_json()
         self.assertEqual(len(data), 2)
-        
+
+    def test_get_item_list_of_order_not_found(self):
+        """It should not List Items of the order that is not found"""
+        resp = self.app.get(f"{BASE_URL}/0/items")
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_update_item(self):
-        """It should Update an item on an order"""
+        """It should Update an Item on an order"""
         # create a known item
         order = self._create_orders(1)[0]
         item = ItemFactory()
@@ -308,6 +347,18 @@ class Test(TestCase):
         self.assertEqual(data["product_id"], 9999)
         self.assertEqual(data["quantity"], 8888)
         self.assertEqual(data["price"], 7777)
+
+    def test_update_item_not_found(self):
+        """It should not Update an Item that is not found"""
+        order = self._create_orders(1)[0]
+        item = ItemFactory()
+        # item have not created yet
+        resp = self.app.put(
+            f"{BASE_URL}/{order.id}/items/{item.id}",
+            json=order.serialize(),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_delete_item(self):
         """It should Delete an Item"""

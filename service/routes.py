@@ -97,6 +97,7 @@ def get_orders(order_id):
 def update_orders(order_id):
     """
     Update an Order
+
     This endpoint will update an Order based the body that is posted
     """
     app.logger.info("Request to update Order with id: %s", order_id)
@@ -120,6 +121,7 @@ def update_orders(order_id):
 def delete_orders(order_id):
     """
     Delete an Order
+
     This endpoint will delete an Order based the id specified in the path
     """
     app.logger.info("Request to delete order with id: %s", order_id)
@@ -234,6 +236,28 @@ def get_items(order_id, item_id):
 
     return make_response(jsonify(item.serialize()), status.HTTP_200_OK)
 
+
+######################################################################
+# DELETE AN ITEM
+######################################################################
+@app.route("/orders/<int:order_id>/items/<int:item_id>", methods=["DELETE"])
+def delete_items(order_id, item_id):
+    """
+    Delete an Item
+
+    This endpoint will delete an Item based the id specified in the path
+    """
+    app.logger.info(
+        "Request to delete Item %s for Order id: %s", (item_id, order_id)
+    )
+
+    item = Item.find(item_id)
+    if item:
+        item.delete()
+
+    return make_response("", status.HTTP_204_NO_CONTENT)
+
+
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
@@ -248,22 +272,3 @@ def check_content_type(media_type):
         status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
         f"Content-Type must be {media_type}"
     )
-
-######################################################################
-# DELETE AN ITEM
-######################################################################
-@app.route("/orders/<int:order_id>/items/<int:order_id>", methods=["DELETE"])
-def delete_items(order_id, item_id):
-    """
-    Delete an Item
-    This endpoint will delete an Item based the id specified in the path
-    """
-    app.logger.info(
-        "Request to delete Item %s for Order id: %s", (item_id, order_id)
-    )
-
-    item = Item.find(item_id)
-    if item:
-        item.delete()
-
-    return make_response("", status.HTTP_204_NO_CONTENT)

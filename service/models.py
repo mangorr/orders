@@ -210,10 +210,10 @@ class Order(db.Model, PersistentBase):
                     Item().deserialize(item))
 
         except KeyError as error:
-            raise DataValidationError("Invalid Account: missing " + error.args[0]) from error
+            raise DataValidationError("Invalid Order: missing " + error.args[0]) from error
         except TypeError as error:
             raise DataValidationError(
-                "Invalid Account: body of request contained bad or no data - " + error.args[0]
+                "Invalid Order: body of request contained bad or no data - " + error.args[0]
             ) from error
         return self
 

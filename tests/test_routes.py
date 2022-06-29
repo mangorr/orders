@@ -137,6 +137,13 @@ class Test(TestCase):
         self.assertEqual(updated_order["tracking_id"], 8888)
         self.assertEqual(updated_order["status"], OrderStatus.CANCELLED.name)
 
+    def test_delete_order(self):
+        """It should Delete an Order"""
+        # get the id of an order
+        order = self._create_orders(1)[0]
+        resp = self.app.delete(f"{BASE_URL}/{order.id}")
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+
     def test_create_orders_wrong_content_type(self):
         """ It should not create an order with wrong content type """
         order = OrderFactory()
@@ -212,7 +219,7 @@ class Test(TestCase):
 
     def test_get_item(self):
         """It should Get an item from an order"""
-        # create a known address
+        # create a known items
         order = self._create_orders(1)[0]
         item = ItemFactory()
         resp = self.app.post(
@@ -308,3 +315,31 @@ class Test(TestCase):
         self.assertEqual(data["product_id"], 9999)
         self.assertEqual(data["quantity"], 8888)
         self.assertEqual(data["price"], 7777)
+
+    def test_delete_item(self):
+        """It should Delete an Item"""
+        order = self._create_orders(1)[0]
+        item = ItemFactory()
+        resp = self.app.post(
+            f"{BASE_URL}/{order.id}/items",
+            json=item.serialize(),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        data = resp.get_json()
+        logging.debug(data)
+        item_id = data["id"]
+
+        # send delete request
+        resp = self.app.delete(
+            f"{BASE_URL}/{order.id}/items/{item_id}",
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+
+        # retrieve it back and make sure item is not there
+        resp = self.app.get(
+            f"{BASE_URL}/{order.id}/items/{item_id}",
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)

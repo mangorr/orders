@@ -113,6 +113,22 @@ def update_orders(order_id):
     order.update()
     return make_response(jsonify(order.serialize()), status.HTTP_200_OK)
 
+######################################################################
+# DELETE AN ORDER
+######################################################################
+@app.route("/orders/<int:order_id>", methods=["DELETE"])
+def delete_orders(order_id):
+    """
+    Delete an Order
+    This endpoint will delete an Order based the id specified in the path
+    """
+    app.logger.info("Request to delete order with id: %s", order_id)
+    order = Order.find(order_id)
+    if order:
+        order.delete()
+    return make_response("", status.HTTP_204_NO_CONTENT)
+
+
 # ---------------------------------------------------------------------
 #                I T E M   M E T H O D S
 # ---------------------------------------------------------------------
@@ -166,7 +182,7 @@ def create_items(order_id):
 
 
 ######################################################################
-# UPDATE A Item
+# UPDATE AN ITEM
 ######################################################################
 @app.route("/orders/<int:order_id>/items/<int:item_id>", methods=["PUT"])
 def update_items(order_id, item_id):
@@ -176,7 +192,7 @@ def update_items(order_id, item_id):
     This endpoint will update an Item based the body that is posted
     """
     app.logger.info(
-        "Request to update Item %s for Account id: %s", (item_id, order_id)
+        "Request to update Item %s for Order id: %s", (item_id, order_id)
     )
     check_content_type("application/json")
 
@@ -185,7 +201,7 @@ def update_items(order_id, item_id):
     if not item:
         abort(
             status.HTTP_404_NOT_FOUND,
-            f"Account with id '{item_id}' could not be found.",
+            f"Order with id '{item_id}' could not be found.",
         )
 
     item.deserialize(request.get_json())
@@ -232,3 +248,22 @@ def check_content_type(media_type):
         status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
         f"Content-Type must be {media_type}"
     )
+
+######################################################################
+# DELETE AN ITEM
+######################################################################
+@app.route("/orders/<int:order_id>/items/<int:order_id>", methods=["DELETE"])
+def delete_items(order_id, item_id):
+    """
+    Delete an Item
+    This endpoint will delete an Item based the id specified in the path
+    """
+    app.logger.info(
+        "Request to delete Item %s for Order id: %s", (item_id, order_id)
+    )
+
+    item = Item.find(item_id)
+    if item:
+        item.delete()
+
+    return make_response("", status.HTTP_204_NO_CONTENT)

@@ -206,7 +206,7 @@ class Test(TestCase):
 
     def test_get_item(self):
         """It should Get an item from an order"""
-        # create a known address
+        # create a known items
         order = self._create_orders(1)[0]
         item = ItemFactory()
         resp = self.app.post(

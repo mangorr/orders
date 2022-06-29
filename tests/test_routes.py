@@ -139,7 +139,7 @@ class Test(TestCase):
         """It should Delete an Order"""
         # get the id of an order
         order = self._create_orders(1)[0]
-        resp = self.client.delete(f"{BASE_URL}/{order.id}")
+        resp = self.app.delete(f"{BASE_URL}/{order.id}")
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_create_orders_wrong_content_type(self):
@@ -313,7 +313,7 @@ class Test(TestCase):
         """It should Delete an Item"""
         order = self._create_orders(1)[0]
         item = ItemFactory()
-        resp = self.client.post(
+        resp = self.app.post(
             f"{BASE_URL}/{order.id}/items",
             json=item.serialize(),
             content_type="application/json",
@@ -324,14 +324,14 @@ class Test(TestCase):
         item_id = data["id"]
 
         # send delete request
-        resp = self.client.delete(
+        resp = self.app.delete(
             f"{BASE_URL}/{order.id}/items/{item_id}",
             content_type="application/json",
         )
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
 
         # retrieve it back and make sure item is not there
-        resp = self.client.get(
+        resp = self.app.get(
             f"{BASE_URL}/{order.id}/items/{item_id}",
             content_type="application/json",
         )

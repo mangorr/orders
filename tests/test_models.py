@@ -105,6 +105,21 @@ class TestOrder(unittest.TestCase):
         self.assertEqual(found_order.status, order.status)
         self.assertEqual(found_order.order_items, [])
 
+    def test_delete_an_order(self):
+        """It should Delete an order from the database"""
+        orders = Order.all()
+        self.assertEqual(orders, [])
+        order = OrderFactory()
+        order.create()
+        # Assert that it was assigned an id and shows up in the database
+        self.assertIsNotNone(order.id)
+        orders = Order.all()
+        self.assertEqual(len(orders), 1)
+        order = orders[0]
+        order.delete()
+        orders = Order.all()
+        self.assertEqual(len(orders), 0)
+
     def test_list_all_orders(self):
         """It should List all Orders in the database"""
         orders = Order.all()
@@ -245,28 +260,13 @@ class TestOrder(unittest.TestCase):
         self.assertEqual(found_item.quantity, item.quantity)
         self.assertEqual(found_item.price, item.price)
 
-    def test_delete_an_order(self):
-        """It should Delete an order from the database"""
-        orders = Order.all()
-        self.assertEqual(orders, [])
-        order = OrderFactory()
-        order.create()
-        # Assert that it was assigned an id and shows up in the database
-        self.assertIsNotNone(order.id)
-        orders = Order.all()
-        self.assertEqual(len(orders), 1)
-        order = orders[0]
-        order.delete()
-        orders = Order.all()
-        self.assertEqual(len(orders), 0)
-
     def test_delete_order_item(self):
         """It should Delete an order item"""
         orders = Order.all()
         self.assertEqual(orders, [])
 
         order = OrderFactory()
-        item = ItemFactory(order=item)
+        item = ItemFactory(order=order)
         order.create()
         # Assert that it was assigned an id and shows up in the database
         self.assertIsNotNone(order.id)
@@ -275,10 +275,10 @@ class TestOrder(unittest.TestCase):
 
         # Fetch it back
         order = Order.find(order.id)
-        address = order.items[0]
-        address.delete()
+        item = order.order_items[0]
+        item.delete()
         order.update()
 
         # Fetch it back again
         order = Order.find(order.id)
-        self.assertEqual(len(order.items), 0)
+        self.assertEqual(len(order.order_items), 0)

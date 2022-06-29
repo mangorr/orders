@@ -24,7 +24,7 @@ class OrderFactory(factory.Factory):
 
     @factory.post_generation
     def order_items(self, create, extracted, **kwargs):
-        """Creates the addresses list"""
+        """Creates the items list"""
         if not create:
             return
 

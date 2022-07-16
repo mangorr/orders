@@ -221,10 +221,10 @@ class Order(db.Model, PersistentBase):
     def find_by_customer(cls, customer_id: int):
         """Returns all Orders of the given customer ID
 
-        :param status: the id of the Customer you want to match
+        :param status: the id of the customer you want to match
         :type category: int
 
-        :return: a collection of Pets in that category
+        :return: a collection of Orders for that customer
         :rtype: list
 
         """
@@ -238,9 +238,23 @@ class Order(db.Model, PersistentBase):
         :param status: values are ['PLACED', 'PAID', 'SHIPPED', 'DELIVERED','CANCELLED']
         :type available: enum
 
-        :return: a collection of Pets that are available
+        :return: a collection of Orders that are with specific status
         :rtype: list
 
         """
         logger.info("Processing status query for %s ...", status.name)
         return cls.query.filter(cls.status == status)
+    
+    @classmethod
+    def find_by_item(cls, product_id: int):
+        """Returns all Orders with the given item product id
+
+        :param product_id: the product id of the item you want to match
+        :type name: int
+
+        :return: a collection of coders with that item inside
+        :rtype: list
+
+        """
+        logger.info("Processing item query for %s ...", product_id)
+        return cls.query.filter(cls.order_items.any(Item.product_id == product_id))

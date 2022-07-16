@@ -43,6 +43,7 @@ def list_orders():
     orders = []
     customer_id = request.args.get("customer_id")
     order_status = request.args.get("status")
+    product_id = request.args.get("product_id")
     if customer_id:
         app.logger.info("Find by customer id: %s", customer_id)
         orders = Order.find_by_customer(int(customer_id))
@@ -51,6 +52,9 @@ def list_orders():
         # create enum from string
         status_value = getattr(OrderStatus, order_status.upper())
         orders = Order.find_by_status(status_value)
+    elif product_id:
+        app.logger.info("Find by items: %s", product_id)
+        orders = Order.find_by_item(int(product_id))
     else:
         app.logger.info("Find all")
         orders = Order.all()

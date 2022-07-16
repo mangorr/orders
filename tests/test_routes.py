@@ -239,6 +239,50 @@ class Test(TestCase):
         for order in data:
             self.assertEqual(order["status"], OrderStatus.PLACED.name)
 
+    def test_query_orders_by_item(self):
+        """It should Query Orders by product id of its including item"""
+        orders = self._create_orders(3)
+        order_1, order_2, order_3 = orders[0], orders[1], orders[2]
+
+        test_item_1 = {"id": 1, "order_id": order_1.id, "product_id": 11,
+                       "quantity": 3, "price": 4}
+        test_item_2 = {"id": 2, "order_id": order_2.id, "product_id": 11,
+                       "quantity": 3, "price": 4}
+        test_item_3 = {"id": 3, "order_id": order_2.id, "product_id": 22,
+                       "quantity": 1, "price": 5}
+
+        # add item product_id 11 to order_1
+        resp = self.app.post(
+            f"{BASE_URL}/{order_1.id}/items",
+            json=test_item_1,
+            content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # add item product_id 11 to order_2
+        resp = self.app.post(
+            f"{BASE_URL}/{order_2.id}/items",
+            json=test_item_2,
+            content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # add item product_id 22 to order_2
+        resp = self.app.post(
+            f"{BASE_URL}/{order_2.id}/items",
+            json=test_item_3,
+            content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # test query item with id 1
+        response = self.app.get(BASE_URL, query_string="product_id=11")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+        data = response.get_json()
+        logging.debug(data)
+        self.assertEqual(len(data), 2)
+
     ######################################################################
     #  I T E M   T E S T   C A S E S
     ######################################################################

@@ -14,6 +14,13 @@ DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/postgres"
 )
 
+
+TEST_PRODUCT_ID = 8
+def _make_item(id=1, order_id=10, product_id=TEST_PRODUCT_ID, quantity=2, price=21):
+    """Create and item for Order."""
+    return Item(id=id, order_id=order_id, product_id=product_id,
+                quantity=quantity, price=price)
+
 ######################################################################
 #  Order   M O D E L   T E S T   C A S E S
 ######################################################################
@@ -131,7 +138,7 @@ class TestOrder(unittest.TestCase):
         self.assertEqual(len(orders), 3)
 
     def test_find_list_by_customer_id(self):
-        """It should Find an Order by customer_id"""
+        """It should Find Orders by customer_id"""
         order = OrderFactory()
         order.create()
         # Fetch it from database by customer_id
@@ -140,7 +147,7 @@ class TestOrder(unittest.TestCase):
         self.assertEqual(same_order.customer_id, order.customer_id)
     
     def test_find_by_status(self):
-        """It should Find Pets by Gender"""
+        """It should Find Orders by status"""
         orders = OrderFactory.create_batch(10)
         for order in orders:
             order.create()
@@ -150,7 +157,14 @@ class TestOrder(unittest.TestCase):
         self.assertEqual(found.count(), count)
         for order in found:
             self.assertEqual(order.status, order_status)
-
+    
+    def test_find_by_including_item(self):
+        """It should Find Orders by its including items"""
+        Order(id=1, customer_id=2, tracking_id = 123, status = OrderStatus(0), order_items=[_make_item()]).create()
+        orders = Order.find_by_item(TEST_PRODUCT_ID)
+        order_list = [order for order in orders]
+        self.assertEqual(len(order_list), 1)
+    
     def test_serialize_an_order(self):
         """It should Serialize an Order"""
         order = OrderFactory()

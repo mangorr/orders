@@ -218,10 +218,43 @@ class Order(db.Model, PersistentBase):
         return self
 
     @classmethod
-    def find_by_customer(cls, customer_id):
+    def find_by_customer(cls, customer_id: int):
         """Returns all Orders of the given customer ID
-        Args:
-            customer_id (int): the id of the Customer you want to match
+
+        :param status: the id of the customer you want to match
+        :type category: int
+
+        :return: a collection of Orders for that customer
+        :rtype: list
+
         """
         logger.info("Processing customer query for %d ...", customer_id)
-        return cls.query.filter(cls.customer_id == customer_id).all()
+        return cls.query.filter(cls.customer_id == customer_id)
+    
+    @classmethod
+    def find_by_status(cls, status: OrderStatus = OrderStatus.PLACED):
+        """Returns all Orders with the given status
+
+        :param status: values are ['PLACED', 'PAID', 'SHIPPED', 'DELIVERED','CANCELLED']
+        :type available: enum
+
+        :return: a collection of Orders that are with specific status
+        :rtype: list
+
+        """
+        logger.info("Processing status query for %s ...", status.name)
+        return cls.query.filter(cls.status == status)
+    
+    @classmethod
+    def find_by_item(cls, product_id: int):
+        """Returns all Orders with the given item product id
+
+        :param product_id: the product id of the item you want to match
+        :type name: int
+
+        :return: a collection of coders with that item inside
+        :rtype: list
+
+        """
+        logger.info("Processing item query for %s ...", product_id)
+        return cls.query.filter(cls.order_items.any(Item.product_id == product_id))

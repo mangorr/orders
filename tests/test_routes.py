@@ -205,13 +205,83 @@ class Test(TestCase):
         data = resp.get_json()
         self.assertEqual(len(data), 5)
 
-    def test_get_order_by_customer(self):
-        """It should Get an Order by customer_id"""
+    # ----------------------------------------------------------
+    # TEST QUERY
+    # ----------------------------------------------------------
+    def test_query_by_customer(self):
+        """It should Query Orders by customer_id"""
         orders = self._create_orders(3)
-        resp = self.app.get(BASE_URL, query_string=f"customer_id={orders[1].customer_id}")
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        data = resp.get_json()
-        self.assertEqual(data[0]["customer_id"], orders[1].customer_id)
+        test_customer_id = orders[0].customer_id
+        customer_id_count = len([order for order in orders if order.customer_id == test_customer_id])
+        response = self.app.get(
+            BASE_URL, query_string=f"customer_id={test_customer_id}"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), customer_id_count)
+        # check the data just to be sure
+        for order in data:
+            self.assertEqual(order["customer_id"], test_customer_id)
+
+    def test_query_by_status(self):
+        """It should Query Orders by status"""
+        orders = self._create_orders(10)
+        placed_orders = [order for order in orders if order.status == OrderStatus.PLACED]
+        placed_count = len(placed_orders)
+        logging.debug("Placed Orders [%d] %s", placed_count, placed_orders)
+
+        # test for available
+        response = self.app.get(BASE_URL, query_string="status=placed")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), placed_count)
+        # check the data just to be sure
+        for order in data:
+            self.assertEqual(order["status"], OrderStatus.PLACED.name)
+
+    def test_query_orders_by_item(self):
+        """It should Query Orders by product id of its including item"""
+        orders = self._create_orders(3)
+        order_1, order_2, order_3 = orders[0], orders[1], orders[2]
+
+        test_item_1 = {"id": 1, "order_id": order_1.id, "product_id": 11,
+                       "quantity": 3, "price": 4}
+        test_item_2 = {"id": 2, "order_id": order_2.id, "product_id": 11,
+                       "quantity": 3, "price": 4}
+        test_item_3 = {"id": 3, "order_id": order_2.id, "product_id": 22,
+                       "quantity": 1, "price": 5}
+
+        # add item product_id 11 to order_1
+        resp = self.app.post(
+            f"{BASE_URL}/{order_1.id}/items",
+            json=test_item_1,
+            content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # add item product_id 11 to order_2
+        resp = self.app.post(
+            f"{BASE_URL}/{order_2.id}/items",
+            json=test_item_2,
+            content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # add item product_id 22 to order_2
+        resp = self.app.post(
+            f"{BASE_URL}/{order_2.id}/items",
+            json=test_item_3,
+            content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # test query item with id 1
+        response = self.app.get(BASE_URL, query_string="product_id=11")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+        data = response.get_json()
+        logging.debug(data)
+        self.assertEqual(len(data), 2)
 
     ######################################################################
     #  I T E M   T E S T   C A S E S

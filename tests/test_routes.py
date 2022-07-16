@@ -205,13 +205,39 @@ class Test(TestCase):
         data = resp.get_json()
         self.assertEqual(len(data), 5)
 
-    def test_get_order_by_customer(self):
-        """It should Get an Order by customer_id"""
+    # ----------------------------------------------------------
+    # TEST QUERY
+    # ----------------------------------------------------------
+    def test_query_by_customer(self):
+        """It should Query Orders by customer_id"""
         orders = self._create_orders(3)
-        resp = self.app.get(BASE_URL, query_string=f"customer_id={orders[1].customer_id}")
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        data = resp.get_json()
-        self.assertEqual(data[0]["customer_id"], orders[1].customer_id)
+        test_customer_id = orders[0].customer_id
+        customer_id_count = len([order for order in orders if order.customer_id == test_customer_id])
+        response = self.app.get(
+            BASE_URL, query_string=f"customer_id={test_customer_id}"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), customer_id_count)
+        # check the data just to be sure
+        for order in data:
+            self.assertEqual(order["customer_id"], test_customer_id)
+
+    def test_query_by_status(self):
+        """It should Query Orders by status"""
+        orders = self._create_orders(10)
+        placed_orders = [order for order in orders if order.status == OrderStatus.PLACED]
+        placed_count = len(placed_orders)
+        logging.debug("Placed Orders [%d] %s", placed_count, placed_orders)
+
+        # test for available
+        response = self.app.get(BASE_URL, query_string="status=placed")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), placed_count)
+        # check the data just to be sure
+        for order in data:
+            self.assertEqual(order["status"], OrderStatus.PLACED.name)
 
     ######################################################################
     #  I T E M   T E S T   C A S E S

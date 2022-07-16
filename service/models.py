@@ -218,10 +218,29 @@ class Order(db.Model, PersistentBase):
         return self
 
     @classmethod
-    def find_by_customer(cls, customer_id):
+    def find_by_customer(cls, customer_id: int):
         """Returns all Orders of the given customer ID
-        Args:
-            customer_id (int): the id of the Customer you want to match
+
+        :param status: the id of the Customer you want to match
+        :type category: int
+
+        :return: a collection of Pets in that category
+        :rtype: list
+
         """
         logger.info("Processing customer query for %d ...", customer_id)
-        return cls.query.filter(cls.customer_id == customer_id).all()
+        return cls.query.filter(cls.customer_id == customer_id)
+    
+    @classmethod
+    def find_by_status(cls, status: OrderStatus = OrderStatus.PLACED):
+        """Returns all Orders with the given status
+
+        :param status: values are ['PLACED', 'PAID', 'SHIPPED', 'DELIVERED','CANCELLED']
+        :type available: enum
+
+        :return: a collection of Pets that are available
+        :rtype: list
+
+        """
+        logger.info("Processing status query for %s ...", status.name)
+        return cls.query.filter(cls.status == status)

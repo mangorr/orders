@@ -6,7 +6,7 @@ Describe what your service does here
 
 from flask import Flask, jsonify, request, url_for, make_response, abort
 from .utils import status  # HTTP Status Codes
-from service.models import Order, Item
+from service.models import Order, Item, OrderStatus
 
 # Import Flask application
 from . import app
@@ -39,14 +39,24 @@ def index():
 def list_orders():
     """Returns all of the Orders"""
     app.logger.info("Request for order list")
+
     orders = []
     customer_id = request.args.get("customer_id")
+    order_status = request.args.get("status")
     if customer_id:
+        app.logger.info("Find by customer id: %s", customer_id)
         orders = Order.find_by_customer(int(customer_id))
+    elif order_status:
+        app.logger.info("Find by status: %s", status)
+        # create enum from string
+        status_value = getattr(OrderStatus, order_status.upper())
+        orders = Order.find_by_status(status_value)
     else:
+        app.logger.info("Find all")
         orders = Order.all()
 
     results = [order.serialize() for order in orders]
+    app.logger.info("[%s] Orders returned", len(results))
     return make_response(jsonify(results), status.HTTP_200_OK)
 
 ######################################################################

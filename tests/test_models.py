@@ -138,6 +138,18 @@ class TestOrder(unittest.TestCase):
         same_order = Order.find_by_customer(order.customer_id)[0]
         self.assertEqual(same_order.id, order.id)
         self.assertEqual(same_order.customer_id, order.customer_id)
+    
+    def test_find_by_status(self):
+        """It should Find Pets by Gender"""
+        orders = OrderFactory.create_batch(10)
+        for order in orders:
+            order.create()
+        order_status = orders[0].status
+        count = len([order for order in orders if order.status == order_status])
+        found = Order.find_by_status(order_status)
+        self.assertEqual(found.count(), count)
+        for order in found:
+            self.assertEqual(order.status, order_status)
 
     def test_serialize_an_order(self):
         """It should Serialize an Order"""

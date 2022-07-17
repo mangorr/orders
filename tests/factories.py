@@ -1,15 +1,12 @@
 """
 Test Factory to make fake objects for testing
 """
-from ast import Or
-from telnetlib import STATUS
+
 import factory
 import random
-from datetime import date, datetime
-from factory.fuzzy import FuzzyChoice, FuzzyDate
+from factory.fuzzy import FuzzyChoice
 from service.models import Order, Item, OrderStatus
-from itsdangerous import Serializer
-from flask_sqlalchemy import SQLAlchemy
+
 
 class OrderFactory(factory.Factory):
     """Creates fake Orders"""
@@ -29,7 +26,7 @@ class OrderFactory(factory.Factory):
             return
 
         if extracted:
-            self.order_items = extracted 
+            self.order_items = extracted
 
 
 class ItemFactory(factory.Factory):

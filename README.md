@@ -1,8 +1,8 @@
 # NYU DevOps - Orders
-[![Build Status](https://github.com/nyu-devops-order/orders/actions/workflows/tdd-tests.yml/badge.svg)](https://github.com/nyu-devops-order/orders/actions)
-
+[![Build Status](https://github.com/nyu-devops-order/orders/actions/workflows/tdd.yml/badge.svg)](https://github.com/nyu-devops-order/orders/actions)
+[![codecov](https://codecov.io/gh/nyu-devops-order/orders/branch/master/graph/badge.svg?token=LRI0KMP6N4)](https://codecov.io/gh/nyu-devops-order/orders)
+[![Python](https://img.shields.io/badge/Language-Python-red.svg)](https://python.org/)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Python](https://img.shields.io/badge/Language-Python-blue.svg)](https://python.org/)
 
 ### Introduction
 This repository maintains the back end for an eCommerce website as a RESTful microservices for the orders resource. An order is a collection of order items where each item represents a product, its quantity, and its price. The microservice supports the complete Create, Read, Update, & Delete (CRUD) lifecycle calls plus List.

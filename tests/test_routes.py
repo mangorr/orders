@@ -12,9 +12,7 @@ Test cases can be run with the following:
 
 import os
 import logging
-import random
 from unittest import TestCase
-from unittest.mock import MagicMock, patch
 from service import app
 from service.models import db, Order, init_db, OrderStatus
 from tests.factories import OrderFactory, ItemFactory
@@ -31,6 +29,8 @@ CONTENT_TYPE_JSON = "application/json"
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
+
+
 class Test(TestCase):
     """ REST API Server Tests """
 
@@ -61,12 +61,12 @@ class Test(TestCase):
     ######################################################################
     #  H E L P E R   M E T H O D S
     ######################################################################
-    
+
     def _create_orders(self, count):
         """Factory method to create orders in bulk"""
         orders = []
         for _ in range(count):
-            order = OrderFactory() 
+            order = OrderFactory()
             resp = self.app.post(BASE_URL, json=order.serialize())
             self.assertEqual(
                 resp.status_code,
@@ -81,7 +81,7 @@ class Test(TestCase):
     ######################################################################
     #  P L A C E   T E S T   C A S E S   H E R E
     ######################################################################
-    
+
     def test_index(self):
         """ It should call the home page """
         resp = self.app.get("/")
@@ -129,7 +129,7 @@ class Test(TestCase):
         new_order["customer_id"] = 9999
         new_order["tracking_id"] = 8888
         new_order["status"] = OrderStatus.CANCELLED.name
-        
+
         resp = self.app.put(f"{BASE_URL}/{new_order_id}", json=new_order)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         updated_order = resp.get_json()
@@ -273,7 +273,7 @@ class Test(TestCase):
         self.assertEqual(data["product_id"], item.product_id)
         self.assertEqual(data["quantity"], item.quantity)
         self.assertEqual(data["price"], item.price)
-    
+
     def test_get_item_list(self):
         """It should Get a list of Items"""
         # add two items to order

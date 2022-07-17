@@ -3,13 +3,11 @@ Models for Order
 
 All of the models are stored in this module
 """
-from email.policy import default
-from itertools import product
+
+
 import logging
 from enum import Enum
-from statistics import quantiles
 from datetime import datetime
-from dotenv import set_key
 from flask_sqlalchemy import SQLAlchemy
 
 logger = logging.getLogger("flask.app")
@@ -20,12 +18,11 @@ db = SQLAlchemy()
 
 class DataValidationError(Exception):
     """ Used for an data validation errors when deserializing """
-
-
-
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
+
+
 def init_db(app):
     """ Initializes the SQLAlchemy app """
     Order.init_db(app)
@@ -44,6 +41,8 @@ class OrderStatus(Enum):
 ######################################################################
 #  P E R S I S T E N T   B A S E   M O D E L
 ######################################################################
+
+
 class PersistentBase:
     """Base class added persistent methods"""
 
@@ -93,12 +92,13 @@ class PersistentBase:
         """Finds a record by it's ID"""
         logger.info("Processing lookup for id %s ...", by_id)
         return cls.query.get(by_id)
-        
 
 ######################################################################
-#  I T E M   M O D E L  
+#  I T E M   M O D E L
 #  Item: represents a product with the quantity and its price
 ######################################################################
+
+
 class Item(db.Model, PersistentBase):
     """
     Class that represents an item
@@ -147,11 +147,12 @@ class Item(db.Model, PersistentBase):
             ) from error
         return self
 
-
 ######################################################################
-#  O R D E R   M O D E L  
+#  O R D E R   M O D E L
 #  Order: a collection of order items
 ######################################################################
+
+
 class Order(db.Model, PersistentBase):
     """
     Class that represents an Order
@@ -169,9 +170,10 @@ class Order(db.Model, PersistentBase):
     )
     order_items = db.relationship('Item', backref='order', passive_deletes=True)
 
-
     def __repr__(self):
-        return f"<Order {self.id}: Customer_id=[{self.customer_id}], Tracking_id=[{self.tracking_id}], Status=[{self.status}], items_number=[{len(self.order_items)}]>"
+        str_return = f"<Order {self.id}: Customer_id=[{self.customer_id}], "
+        str_return += f"Tracking_id=[{self.tracking_id}], Status=[{self.status}], items_number=[{len(self.order_items)}]>"
+        return str_return
 
     def serialize(self):
         """Serializes an order into a dictionary"""
@@ -183,7 +185,7 @@ class Order(db.Model, PersistentBase):
             "id": self.id,
             "customer_id": self.customer_id,
             "tracking_id": self.tracking_id,
-            "created_time":self.created_time,
+            "created_time": self.created_time,
             "status": self.status.name,
             "order_items": items
         }
@@ -200,11 +202,11 @@ class Order(db.Model, PersistentBase):
             if "id" in data:
                 self.id = data["id"]
 
-            self.customer_id = data["customer_id"] 
+            self.customer_id = data["customer_id"]
             self.tracking_id = data["tracking_id"]
             self.status = getattr(OrderStatus, data["status"])
-   
-            self.order_items = []    
+
+            self.order_items = []
             for item in data["order_items"]:
                 self.order_items.append(
                     Item().deserialize(item))

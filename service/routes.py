@@ -4,7 +4,7 @@ My Service
 Describe what your service does here
 """
 
-from flask import Flask, jsonify, request, url_for, make_response, abort
+from flask import jsonify, request, url_for, make_response, abort
 from .utils import status  # HTTP Status Codes
 from service.models import Order, Item
 
@@ -35,6 +35,8 @@ def index():
 ######################################################################
 # LIST ALL ORDERS
 ######################################################################
+
+
 @app.route("/orders", methods=["GET"])
 def list_orders():
     """Returns all of the Orders"""
@@ -52,11 +54,12 @@ def list_orders():
 ######################################################################
 # CREATE A NEW ORDER
 ######################################################################
+
+
 @app.route("/orders", methods=["POST"])
 def create_orders():
     """
     Creates an Order
-    
     This endpoint will create an Order based the data in the body that is posted
     """
     app.logger.info("Request to create an Order")
@@ -73,6 +76,8 @@ def create_orders():
 ######################################################################
 # RETRIEVE AN ORDER
 ######################################################################
+
+
 @app.route("/orders/<int:order_id>", methods=["GET"])
 def get_orders(order_id):
     """
@@ -93,6 +98,8 @@ def get_orders(order_id):
 ######################################################################
 # UPDATE AN EXISTING ORDER
 ######################################################################
+
+
 @app.route("/orders/<int:order_id>", methods=["PUT"])
 def update_orders(order_id):
     """
@@ -105,7 +112,7 @@ def update_orders(order_id):
     order = Order.find(order_id)
     if not order:
         abort(
-            status.HTTP_404_NOT_FOUND, 
+            status.HTTP_404_NOT_FOUND,
             f"Order with id '{order_id}' was not found."
         )
 
@@ -117,6 +124,8 @@ def update_orders(order_id):
 ######################################################################
 # DELETE AN ORDER
 ######################################################################
+
+
 @app.route("/orders/<int:order_id>", methods=["DELETE"])
 def delete_orders(order_id):
     """
@@ -209,7 +218,7 @@ def update_items(order_id, item_id):
     item.deserialize(request.get_json())
     item.id = item_id
     item.update()
-    
+
     return make_response(jsonify(item.serialize()), status.HTTP_200_OK)
 
 

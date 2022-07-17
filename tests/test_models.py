@@ -5,7 +5,6 @@ Test cases for Order Model
 import os
 import logging
 import unittest
-import random
 from service import app
 from service.models import Order, Item, DataValidationError, db, OrderStatus
 from tests.factories import OrderFactory, ItemFactory
@@ -17,6 +16,8 @@ DATABASE_URI = os.getenv(
 ######################################################################
 #  Order   M O D E L   T E S T   C A S E S
 ######################################################################
+
+
 class TestOrder(unittest.TestCase):
     """ Test Cases for Order Model """
 
@@ -42,7 +43,6 @@ class TestOrder(unittest.TestCase):
     def tearDown(self):
         """ This runs after each test """
         db.session.remove()
-        
 
     ######################################################################
     #  T E S T   C A S E S
@@ -189,7 +189,7 @@ class TestOrder(unittest.TestCase):
         """It should not Deserialize an Item with a TypeError"""
         item = Item()
         self.assertRaises(DataValidationError, item.deserialize, [])
-    
+
     def test_add_order_item(self):
         """It should Create an Item with an order and add it to the database"""
         orders = Order.all()
@@ -201,7 +201,7 @@ class TestOrder(unittest.TestCase):
         # Assert that it was assigned an id and shows up in the database
         self.assertIsNotNone(order.id)
         orders = Order.all()
-        self.assertEqual(len(orders), 1) 
+        self.assertEqual(len(orders), 1)
 
         new_order = Order.find(order.id)
         self.assertEqual(new_order.order_items[0].id, item.id)

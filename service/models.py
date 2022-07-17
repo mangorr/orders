@@ -172,7 +172,7 @@ class Order(db.Model, PersistentBase):
 
     def __repr__(self):
         str_return = f"<Order {self.id}: Customer_id=[{self.customer_id}], "
-        str_return += f"Tracking_id=[{self.tracking_id}], Status=[{self.status}], " 
+        str_return += f"Tracking_id=[{self.tracking_id}], Status=[{self.status}], "
         str_return += f"items_number=[{len(self.order_items)}]>"
         return str_return
 

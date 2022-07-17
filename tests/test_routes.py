@@ -242,7 +242,7 @@ class Test(TestCase):
     def test_query_orders_by_item(self):
         """It should Query Orders by product id of its including item"""
         orders = self._create_orders(3)
-        order_1, order_2, order_3 = orders[0], orders[1], orders[2]
+        order_1, order_2 = orders[0], orders[1]
 
         test_item_1 = {"id": 1, "order_id": order_1.id, "product_id": 11,
                        "quantity": 3, "price": 4}
@@ -278,7 +278,7 @@ class Test(TestCase):
         # test query item with id 1
         response = self.app.get(BASE_URL, query_string="product_id=11")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        
+
         data = response.get_json()
         logging.debug(data)
         self.assertEqual(len(data), 2)

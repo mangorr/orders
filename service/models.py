@@ -232,7 +232,7 @@ class Order(db.Model, PersistentBase):
         """
         logger.info("Processing customer query for %d ...", customer_id)
         return cls.query.filter(cls.customer_id == customer_id)
-    
+
     @classmethod
     def find_by_status(cls, status: OrderStatus = OrderStatus.PLACED):
         """Returns all Orders with the given status
@@ -246,7 +246,7 @@ class Order(db.Model, PersistentBase):
         """
         logger.info("Processing status query for %s ...", status.name)
         return cls.query.filter(cls.status == status)
-    
+
     @classmethod
     def find_by_item(cls, product_id: int):
         """Returns all Orders with the given item product id
@@ -260,4 +260,3 @@ class Order(db.Model, PersistentBase):
         """
         logger.info("Processing item query for %s ...", product_id)
         return cls.query.filter(cls.order_items.any(Item.product_id == product_id))
-

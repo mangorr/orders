@@ -5,8 +5,8 @@ Describe what your service does here
 """
 
 from flask import jsonify, request, url_for, make_response, abort
-from .utils import status  # HTTP Status Codes
 from service.models import Order, Item, OrderStatus
+from .utils import status  # HTTP Status Codes
 
 # Import Flask application
 from . import app

@@ -9,7 +9,6 @@ RUN apt-get update && \
 
 # Create a user for development
 ARG USERNAME=vscode
-# ARG USERNAME=vscode
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 

@@ -226,9 +226,37 @@ class Test(TestCase):
         self.assertEqual(updated_order["tracking_id"], 8888)
         self.assertEqual(updated_order["status"], OrderStatus.CANCELLED.name)
 
+    def test_cancel_order_failed(self):
+        """It should Cancel an existing Order"""
+        # create an Order to cancel
+        test_order = OrderFactory()
+        resp = self.app.post(BASE_URL, json=test_order.serialize())
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # cancel the order
+        new_order = resp.get_json()
+        new_order_id = new_order["id"]
+        new_order["customer_id"] = 9999
+        new_order["tracking_id"] = 8888
+        new_order["status"] = OrderStatus.DELIVERED.name
+
+        resp = self.app.put(
+            f"{BASE_URL}/{new_order_id}/cancel", json=new_order)
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        updated_order = resp.get_json()
+        self.assertEqual(updated_order["customer_id"], 9999)
+        self.assertEqual(updated_order["tracking_id"], 8888)
+        self.assertEqual(updated_order["status"], OrderStatus.DELIVERED.name)
+
+    def test_cancel_order_not_found(self):
+        """It should not Read an Order that is not found"""
+        resp = self.app.get(f"{BASE_URL}/0/cancel")
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
     # ----------------------------------------------------------
     # TEST QUERY
     # ----------------------------------------------------------
+
     def test_query_by_customer(self):
         """It should Query Orders by customer_id"""
         orders = self._create_orders(3)

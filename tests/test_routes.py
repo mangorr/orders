@@ -205,6 +205,27 @@ class Test(TestCase):
         data = resp.get_json()
         self.assertEqual(len(data), 5)
 
+    def test_cancel_order_succeed(self):
+        """It should Cancel an existing Order"""
+        # create an Order to cancel
+        test_order = OrderFactory()
+        resp = self.app.post(BASE_URL, json=test_order.serialize())
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # cancel the order
+        new_order = resp.get_json()
+        new_order_id = new_order["id"]
+        new_order["customer_id"] = 9999
+        new_order["tracking_id"] = 8888
+        new_order["status"] = OrderStatus.PAID.name
+
+        resp = self.app.put(f"{BASE_URL}/{new_order_id}/cancel", json=new_order)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        updated_order = resp.get_json()
+        self.assertEqual(updated_order["customer_id"], 9999)
+        self.assertEqual(updated_order["tracking_id"], 8888)
+        self.assertEqual(updated_order["status"], OrderStatus.CANCELLED.name)
+
     # ----------------------------------------------------------
     # TEST QUERY
     # ----------------------------------------------------------

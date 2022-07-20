@@ -153,6 +153,48 @@ def delete_orders(order_id):
         order.delete()
     return make_response("", status.HTTP_204_NO_CONTENT)
 
+######################################################################
+# CANCEL AN ORDER
+######################################################################
+
+
+@app.route("/orders/<int:order_id>/cancel", methods=["PUT"])
+def cancel_orders(order_id):
+    """
+    Cancel an Order
+
+    This endpoint will cancel an Order based the body that is posted
+    """
+    app.logger.info("Request to cancel Order with id: %s", order_id)
+    check_content_type("application/json")
+    order = Order.find(order_id)
+    if not order:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Order with id '{order_id}' was not found."
+        )
+
+    order.deserialize(request.get_json())
+    # Check if the order can be cancelled
+    allow_to_cancel = True
+    for order_item in order.order_items:
+        if order_item.status in ["DELIVERED", "SHIPPED"]:
+            allow_to_cancel = False
+            break
+    
+    if not allow_to_cancel:
+        abort (
+            status.HTTP_400_BAD_REQUEST,
+            f"Order with id '{order_id}' can't be cancelled because some items have been shipped or delivered."
+        )
+    else:
+        order.status = "CANCELLED"
+        
+    order.id = order_id
+    order.update()
+    return make_response(jsonify(order.serialize()), status.HTTP_200_OK)
+
+
 
 # ---------------------------------------------------------------------
 #                I T E M   M E T H O D S

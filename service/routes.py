@@ -177,15 +177,13 @@ def cancel_orders(order_id):
     order.deserialize(request.get_json())
 
     # Check if the order can be cancelled
-    if order.status in ["DELIVERED", "SHIPPED"]:
+    if order.status in [OrderStatus.DELIVERED, OrderStatus.SHIPPED]:
         abort(
             status.HTTP_400_BAD_REQUEST,
-            f"Order '{order_id}' can't be cancelled \
-                -- some items have been shipped or delivered."
+            f"Order with id '{order_id}' cannot be cancelled."
         )
-    else:
-        order.status = "CANCELLED"
 
+    order.status = OrderStatus.CANCELLED
     order.id = order_id
     order.update()
     return make_response(jsonify(order.serialize()), status.HTTP_200_OK)

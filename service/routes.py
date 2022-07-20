@@ -181,19 +181,19 @@ def cancel_orders(order_id):
         if order_item.status in ["DELIVERED", "SHIPPED"]:
             allow_to_cancel = False
             break
-    
+
     if not allow_to_cancel:
-        abort (
+        abort(
             status.HTTP_400_BAD_REQUEST,
-            f"Order with id '{order_id}' can't be cancelled because some items have been shipped or delivered."
+            f"Order '{order_id}' can't be cancelled \
+                -- some items have been shipped or delivered."
         )
     else:
         order.status = "CANCELLED"
-        
+
     order.id = order_id
     order.update()
     return make_response(jsonify(order.serialize()), status.HTTP_200_OK)
-
 
 
 # ---------------------------------------------------------------------
@@ -204,6 +204,8 @@ def cancel_orders(order_id):
 ######################################################################
 # LIST ITEMS
 ######################################################################
+
+
 @app.route("/orders/<int:order_id>/items", methods=["GET"])
 def list_items(order_id):
     """Returns all of the Items for an order"""

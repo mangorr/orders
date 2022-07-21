@@ -153,6 +153,41 @@ def delete_orders(order_id):
         order.delete()
     return make_response("", status.HTTP_204_NO_CONTENT)
 
+######################################################################
+# CANCEL AN ORDER
+######################################################################
+
+
+@app.route("/orders/<int:order_id>/cancel", methods=["PUT"])
+def cancel_orders(order_id):
+    """
+    Cancel an Order
+
+    This endpoint will cancel an Order based the body that is posted
+    """
+    app.logger.info("Request to cancel Order with id: %s", order_id)
+    check_content_type("application/json")
+    order = Order.find(order_id)
+    if not order:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Order with id '{order_id}' was not found."
+        )
+
+    order.deserialize(request.get_json())
+
+    # Check if the order can be cancelled
+    if order.status in [OrderStatus.DELIVERED, OrderStatus.SHIPPED]:
+        abort(
+            status.HTTP_400_BAD_REQUEST,
+            f"Order with id '{order_id}' cannot be cancelled."
+        )
+
+    order.status = OrderStatus.CANCELLED
+    order.id = order_id
+    order.update()
+    return make_response(jsonify(order.serialize()), status.HTTP_200_OK)
+
 
 # ---------------------------------------------------------------------
 #                I T E M   M E T H O D S
@@ -162,6 +197,8 @@ def delete_orders(order_id):
 ######################################################################
 # LIST ITEMS
 ######################################################################
+
+
 @app.route("/orders/<int:order_id>/items", methods=["GET"])
 def list_items(order_id):
     """Returns all of the Items for an order"""

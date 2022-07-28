@@ -205,7 +205,7 @@ class Order(db.Model, PersistentBase):
             self.status = getattr(OrderStatus, data["status"])
 
             self.order_items = []
-            if("order_items" in data.keys()):
+            if "order_items" in data.keys():
                 for item in data["order_items"]:
                     self.order_items.append(
                         Item().deserialize(item))

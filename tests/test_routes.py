@@ -26,11 +26,10 @@ DATABASE_URI = os.getenv(
 
 CONTENT_TYPE_JSON = "application/json"
 
+
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
-
-
 class Test(TestCase):
     """ REST API Server Tests """
 
@@ -39,6 +38,7 @@ class Test(TestCase):
         """Run once before all tests"""
         app.config["TESTING"] = True
         app.config["DEBUG"] = False
+        # Set up the test database
         app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
         app.logger.setLevel(logging.CRITICAL)
         init_db(app)
@@ -46,13 +46,13 @@ class Test(TestCase):
     @classmethod
     def tearDownClass(cls):
         """Runs once before test suite"""
-        pass
+        db.session.close()
 
     def setUp(self):
         """Runs before each test"""
+        self.app = app.test_client()
         db.session.query(Order).delete()  # clean up the last tests
         db.session.commit()
-        self.app = app.test_client()
 
     def tearDown(self):
         """Runs once after each test case"""
@@ -87,6 +87,13 @@ class Test(TestCase):
         resp = self.app.get("/")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertIn(b'Order REST API Service', resp.data)
+
+    def test_health(self):
+        """It should be healthy"""
+        resp = self.app.get("/health")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(data['message'], 'OK')
 
     def test_create_order(self):
         """It should Create a new Order"""
@@ -218,6 +225,7 @@ class Test(TestCase):
         new_order["customer_id"] = 9999
         new_order["tracking_id"] = 8888
         new_order["status"] = OrderStatus.PAID.name
+        resp = self.app.put(f"{BASE_URL}/{new_order_id}", json=new_order)
 
         resp = self.app.put(f"{BASE_URL}/{new_order_id}/cancel", json=new_order)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -239,10 +247,26 @@ class Test(TestCase):
         new_order["customer_id"] = 1111
         new_order["tracking_id"] = 2222
         new_order["status"] = OrderStatus.DELIVERED.name
+        resp = self.app.put(f"{BASE_URL}/{new_order_id}", json=new_order)
 
         resp = self.app.put(
             f"{BASE_URL}/{new_order_id}/cancel", json=new_order)
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_cancel_order_not_exist(self):
+        """It should not Cancel an non-existing Order"""
+        # create an Order to cancel
+        test_order = OrderFactory()
+        resp = self.app.post(BASE_URL, json=test_order.serialize())
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # generate the request
+        new_order = resp.get_json()
+        new_order_id = new_order["id"] + 1
+
+        resp = self.app.put(
+            f"{BASE_URL}/{new_order_id}/cancel", json=new_order)
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     # ----------------------------------------------------------
     # TEST QUERY

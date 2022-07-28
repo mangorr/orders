@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Order REST API Service</title>
+    <link href="static/NYU.ico" rel="shortcut icon">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="static/css/blue_bootstrap.min.css">
+    <script type="text/javascript" src="static/js/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="static/js/rest_api.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <link href="http://fonts.cdnfonts.com/css/gotham" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        
+        <div id="app">
+          <div class="page-header" >
+            <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect" text-color="#fff" active-text-color="#fff" style="background-color: #57068c;border:none">
+            <el-menu-item index="1" disabled style="cursor: default;opacity:inherit">
+                <img src="static/NYU_Long_RGB_White.png" style="width: 350px;" />
+            </el-menu-item>
+            <el-menu-item index="2">Orders</el-menu-item>
+            <el-menu-item index="3">Items</el-menu-item>
+            </el-menu>
+            <br/>
+          </div>
+          <div id="Orders_container" style="margin:0px 10% 0px;background-color:#4e5d6c;">
+            <!-- Flash Message -->
+            <div class="well" id="well-container" style="height: 82vh;">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" >Status</label>
+                        <div class="col-sm-10">
+                            <el-input id="flash_message" v-model="flash_message" :readonly="true"></el-input>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="order_id">Order ID:</label>
+                        <div class="col-sm-6">
+                            <el-input id="order_id" v-model="order_id" placeholder="Enter ID of Order"></el-input>
+                        </div>
+                        <div class="col-sm-4">
+                            <el-button type="primary" id="retrieve-btn">Retrieve</el-button>
+                            <el-button type="danger" id="delete-btn">Delete</el-button>
+                            <el-button type="primary" id="cancel-btn">Cancel</el-button>
+                        </div>
+                    </div>
+                </div> <!-- form div -->
+
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="customer_id">Customer ID:</label>
+                        <div class="col-sm-10">
+                            <el-input id="customer_id" v-model="customer_id" placeholder="Enter customer ID for Order" ></el-input>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="tracking_id">Tracking ID:</label>
+                        <div class="col-sm-10">
+                            <el-input id="tracking_id" v-model="tracking_id" placeholder="Enter tracking ID for Order"></el-input>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="status">Status:</label>
+                        <div class="col-sm-10">
+                            <el-select id="status" v-model="order_status">
+                                <el-option
+                                    v-for="item in order_options"
+                                    :key="item.value"
+                                    :label="item.label"
+                                    :value="item.value">
+                                </el-option>
+                            </el-select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="create_time">Create Time:</label>
+                        <div class="col-sm-10">
+                            <el-input id="created_time" v-model="create_time" :readonly="true">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <el-button type="primary" @click="getlist">List Orders</el-button>
+                            <el-button type="primary" id="clear-btn">Clear</el-button>
+                            <el-button type="success" id="create-btn">Create</el-button>
+                            <el-button type="warning" id="update-btn">Update</el-button>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="query">Query</label>
+                        <div class="col-sm-10">
+                            <input type="radio" id="cid" name="query_option" value="cid" style="margin-top:1.2%;">
+                            <label for="cid">Customer ID</label><br>
+                            <input type="radio" id="stat" name="query_option" value="stat">
+                            <label for="stat">Status</label><br>
+                            <input type="radio" id="pid" name="query_option" value="pid">
+                            <label for="pid">Product ID</label><br>
+                            <el-input id="query" v-model="query_value" placeholder="Enter query value" style="margin-bottom: 10px ;"></el-input>
+                            <br>
+                            <el-button type="primary" id="search-btn" @click="query_list">Search</button>
+                        </div>
+                    </div>
+                </div> <!-- form div -->
+
+                <!-- Search Results -->
+                <div class="table-responsive col-md-12" id="search_results" style="display: none;">
+                    <el-table id="result_table" 
+                    :data="list_all"
+                    :row-key="row => { return row['id'] }"
+                    :expand-row-keys="expand_row"
+                    highlight-current-row 
+                    border 
+                    fit 
+                    @row-click="retrieve_order"
+                    @sort-change = "sort_table_list" 
+                    style="overflow:auto;height:65vh;cursor:pointer"  >
+                        <el-table-column type="expand" width="1">
+                            <el-table :data="order_items" highlight-current-row border fit @sort-change="sort_table_list_order_item">
+                                <el-table-column label="Item ID" min-width="120px" align="center" sortable='custom' prop='id'>
+                                    <template slot-scope="{row}">
+                                        <span>{{ row.id }}</span>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column label="Product ID" min-width="120px" align="center" sortable='custom' prop='product_id'>
+                                    <template slot-scope="{row}">
+                                        <span>{{ row.product_id }}</span>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column label="Quantity" min-width="120px" align="center" sortable='custom' prop='quantity'>
+                                    <template slot-scope="{row}">
+                                        <span>{{ row.quantity }}</span>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column label="Price" min-width="120px" align="center" sortable='custom' prop='price'>
+                                    <template slot-scope="{row}">
+                                        <span>{{ row.price }}</span>
+                                    </template>
+                                </el-table-column>
+                            </el-table>
+                        </el-table-column>
+                        <el-table-column label="Order Id" min-width="120px" align="center" sortable='custom' prop='id'>
+                            <template slot-scope="{row}">
+                                <span>{{ row.id }}</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="Customer Id" min-width="120px" align="center" sortable='custom' prop='customer_id'>
+                            <template slot-scope="{row}">
+                                <span>{{ row.customer_id }}</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="Tracking Id" min-width="120px" align="center" sortable='custom' prop='tracking_id'>
+                            <template slot-scope="{row}">
+                                <span>{{ row.tracking_id }}</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="Status" min-width="120px" align="center" prop='status'>
+                            <template slot-scope="{row}">
+                                <span>{{ row.status }}</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="Create Time" min-width="120px" align="center" sortable='custom' prop='created_time'>
+                            <template slot-scope="{row}">
+                                <span>{{ row.created_time }}</span>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </div>
+                <!--/row-->
+            </div>
+          </div>
+          <div id="Items_container" style="display: none;min-height: 79vh;margin:0px 10% 0px;background-color:#4e5d6c;">
+            <!-- Flash Message -->
+            <div class="well" id="well-container-item" style="height: 82vh;">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" >Status</label>
+                        <div class="col-sm-10">
+                            <el-input id="flash_message_item" v-model="flash_message_item" :readonly="true"></el-input>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="item_id">Item ID:</label>
+                        <div class="col-sm-6">
+                            <el-input id="item_id" v-model="item_id" placeholder="Enter ID of Item"></el-input>
+                        </div>
+                        <div class="col-sm-4">
+                            <el-button type="primary" id="retrieve-item-btn">Retrieve</el-button>
+                            <el-button type="danger" id="delete-item-btn">Delete</el-button>
+                        </div>
+                    </div>
+                </div> <!-- form div -->
+
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="item_order_id">Order ID:</label>
+                        <div class="col-sm-10">
+                            <el-input id="item_order_id" v-model="item_order_id" placeholder="Enter Order ID for Item" ></el-input>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="product_id">Product ID:</label>
+                        <div class="col-sm-10">
+                            <el-input id="product_id" v-model="product_id" placeholder="Enter Product ID for Item"></el-input>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="quantity">Quantity:</label>
+                        <div class="col-sm-10">
+                            <el-input id="quantity" v-model="quantity" placeholder="Enter Quantity for Item"></el-input>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="price">Price</label>
+                        <div class="col-sm-10">
+                            <el-input id="price" v-model="price" placeholder="Enter Price for Item">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <el-button type="primary" @click="get_item_list">List Items</el-button>
+                            <el-button type="primary" id="clear-item-btn">Clear</el-button>
+                            <el-button type="success" id="create-item-btn">Create</el-button>
+                            <el-button type="warning" id="update-item-btn">Update</el-button>
+                        </div>
+                    </div>
+
+                </div> <!-- form div -->
+
+                <!-- Search Results -->
+                <div class="table-responsive col-md-12" id="search_results_item" style="display: none;">
+                    <el-table id="result_table_item" highlight-current-row border fit @row-click="retrieve_item" style="overflow:auto;height:65vh;cursor:pointer" :data="list_all_item" @sort-change = "sort_table_list">
+                        <el-table-column label="Item Id" min-width="120px" align="center" sortable='custom' prop='id'>
+                            <template slot-scope="{row}">
+                                <span>{{ row.id }}</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="Order Id" min-width="120px" align="center" sortable='custom' prop='order_id'>
+                            <template slot-scope="{row}">
+                                <span>{{ row.order_id }}</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="Product Id" min-width="120px" align="center" sortable='custom' prop='product_id'>
+                            <template slot-scope="{row}">
+                                <span>{{ row.product_id }}</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="Quantity" min-width="120px" align="center" sortable='custom' prop='quantity'>
+                            <template slot-scope="{row}">
+                                <span>{{ row.quantity }}</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="Price" min-width="120px" align="center" sortable='custom' prop='price'>
+                            <template slot-scope="{row}">
+                                <span>{{ row.price }}</span>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </div>
+                <!--/row-->
+            </div>
+          </div>
+          <div class="footer">
+            <p style="color: #000000;text-align:center">Summer 2022 Orders team @ NYU Devops and Agile</p> 
+          </div>
+        </div>
+    </div>
+</body>
+
+
+<script>
+  new Vue({
+    el:"#app",
+    data: function(){
+      return {
+        activeName: 'order',
+        activeIndex:"2",
+        expand_row:[],
+        // Order
+        list_all:[],
+        flash_message:"",
+        order_id:null,
+        customer_id:null,
+        tracking_id:null,
+        order_status:"PLACED",
+        create_time:null,
+        query_value:null,
+        order_options:[{
+            value: 'PLACED',
+            label: 'PLACED'
+          }, {
+            value: 'PAID',
+            label: 'PAID'
+          }, {
+            value: 'SHIPPED',
+            label: 'SHIPPED'
+          }, {
+            value: 'DELIVERED',
+            label: 'DELIVERED'
+          }, {
+            value: 'CANCELLED',
+            label: 'CANCELLED'
+          }],
+        order_items:[],
+        
+        // Item
+        list_all_item:[],
+        flash_message_item:"",
+        item_id:null,
+        item_order_id:null,
+        product_id:null,
+        quantity:null,
+        price:null,
+        query_item_value:null,
+      };
+    },
+    methods: {
+      handleClick(tab, event) {
+        console.log(tab, event);
+      },
+      handleSelect(key, keyPath) {
+        if(key=="2"){
+          // hide div for Items
+          var item_div = document.getElementById("Items_container")
+          item_div.style.display = "none"
+          var order_div = document.getElementById("Orders_container")
+          order_div.style.display = "block"
+          
+        }else if(key=="3"){
+          var order_div = document.getElementById("Orders_container")
+          order_div.style.display = "none"
+          var item_div = document.getElementById("Items_container")
+          item_div.style.display = "block"
+        }
+      },
+      // get order list
+      getlist(){
+        this.list_all = []
+
+        var ajax = $.ajax({
+            type: "GET",
+            url: "/orders",
+            data:''
+        })
+        var that = this
+        ajax.done(function (res) {
+            console.log(res)
+            that.list_all = res
+            var well_container = document.getElementById("well-container")
+            well_container.style.height="150vh"
+            var result_container = document.getElementById("search_results")
+            result_container.style.display = "block";
+            $("#flash_message").val("");
+            $("#flash_message").val("Success");
+        })
+        ajax.fail(function (res) {
+            $("#flash_message").val("");
+            $("#flash_message").val(res.responseJSON.message);
+        });
+      },
+      // query order list
+      query_list(){
+        this.list_all = []
+
+        var ele = document.getElementsByName('query_option');
+        var data={}
+        if (ele[0].checked) {
+            data["customer_id"] = $("#query").val();
+        }else if(ele[1].checked) {
+            data["status"] = $("#query").val();
+        }else if(ele[2].checked){
+            data["product_id"] = $("#query").val();
+        }else{
+            $("#flash_message").val("");
+            $("#flash_message").val("Please select one of the query type!");
+            return 
+        }
+
+        var that = this
+        var ajax = $.ajax({
+            type: "GET",
+            url: "/orders",
+            data: data
+        })
+        
+        ajax.done(function (res) {
+            that.list_all = res
+            var well_container = document.getElementById("well-container")
+            well_container.style.height="150vh"
+            var result_container = document.getElementById("search_results")
+            result_container.style.display = "block";
+            $("#flash_message").val("");
+            $("#flash_message").val("Success");
+        })
+        ajax.fail(function (res) {
+            $("#flash_message").val("");
+            $("#flash_message").val(res.responseJSON.message);
+        });
+      },
+      // click row in the table
+      retrieve_order(row){
+        if(row!=""){
+            this.order_id = row.id
+            this.customer_id = row.customer_id
+            this.tracking_id = row.tracking_id
+            this.order_status = row.status
+            this.create_time = row.created_time
+        }
+        this.toogleExpand(row)
+      },
+      // 展开详情
+      toogleExpand(row) {
+        if(row['id'] == this.expand_row[0]){
+          this.expand_row = []
+        }
+        else{
+          this.expand_row = [row['id']]
+          this.order_items = row.order_items
+        }
+      },
+      // sort orders
+      sort_table_list({prop, order}){
+        if(order == 'descending'){
+            this.list_all.sort(function (a, b) {
+                return b[prop] - a[prop]
+            })
+        }
+        else if(order == 'ascending'){
+            this.list_all.sort(function (a, b) {
+                return a[prop] - b[prop]
+            })
+        }
+      },
+      // sort order items
+      sort_table_list_order_item({prop, order}){
+        if(order == 'descending'){
+            this.order_items.sort(function (a, b) {
+                return b[prop] - a[prop]
+            })
+        }
+        else if(order == 'ascending'){
+            this.order_items.sort(function (a, b) {
+                return a[prop] - b[prop]
+            })
+        }
+      },
+      // get item list
+      get_item_list(){
+        this.list_all_item = []
+
+        var order_id = $("#item_order_id").val();
+        var ajax = $.ajax({
+            type: "GET",
+            url: `/orders/${order_id}/items`,
+            data:''
+        })
+
+        var that = this
+        ajax.done(function (res) {
+            that.list_all_item = res
+            var well_container_item = document.getElementById("well-container-item")
+            well_container_item.style.height="150vh"
+            var result_container_item = document.getElementById("search_results_item")
+            result_container_item.style.display = "block";
+            $("#flash_message_item").val("");
+            $("#flash_message_item").val("Success");
+        })
+        ajax.fail(function (res) {
+            $("#flash_message_item").val("");
+            $("#flash_message_item").val(res.responseJSON.message);
+        });
+      },
+      // click row in the table
+      retrieve_item(row){
+        if(row!=""){
+            this.item_id = row.id
+            this.item_order_id = row.order_id
+            this.product_id = row.product_id
+            this.quantity = row.quantity
+            this.price = row.price
+        }
+      },
+      // sort
+      sort_table_list_item({prop, order}){
+        if(order == 'descending'){
+            this.list_all_item.sort(function (a, b) {
+                return b[prop] - a[prop]
+            })
+        }
+        else if(order == 'ascending'){
+            this.list_all_item.sort(function (a, b) {
+                return a[prop] - b[prop]
+            })
+        }
+      },
+    }
+
+  })
+</script>
+
+<style>
+  .el-tabs--border-card{
+    border: 10px solid #57068c;
+    border-radius: 10px;
+  }
+
+  .el-menu-item.is-disabled {
+    cursor: default;
+  }
+  .el-menu--horizontal>.el-menu-item:hover{
+    background-color: #404040 !important;
+  }
+  .el-menu--horizontal>.el-menu-item.is-active{
+    background-color: #57068c !important;
+  }
+  .el-menu--horizontal>.el-menu-item.is-active:hover{
+    background-color: #404040 !important;
+  }
+  .el-menu--horizontal>.el-menu-item{
+    font-family: "Gotham", sans-serif;
+    font-weight: 400 !important;
+    font-size: 17px;
+  }
+  .el-table--border::after, .el-table--group::after, .el-table::before{
+    z-index: inherit;
+  }
+</style>
+</html>
+
+

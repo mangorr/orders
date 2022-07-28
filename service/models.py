@@ -200,17 +200,15 @@ class Order(db.Model, PersistentBase):
             data (dict): A dictionary containing the order data
         """
         try:
-            if "id" in data:
-                self.id = data["id"]
-
             self.customer_id = data["customer_id"]
             self.tracking_id = data["tracking_id"]
             self.status = getattr(OrderStatus, data["status"])
 
             self.order_items = []
-            for item in data["order_items"]:
-                self.order_items.append(
-                    Item().deserialize(item))
+            if("order_items" in data.keys()):
+                for item in data["order_items"]:
+                    self.order_items.append(
+                        Item().deserialize(item))
 
         except KeyError as error:
             raise DataValidationError("Invalid Order: missing " + error.args[0]) from error

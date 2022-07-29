@@ -1,5 +1,4 @@
 FROM python:3.9-slim
-FROM rofrano/pipeline-selenium:latest
  
 # Installed Chrome and Selenium in our development environment.
 RUN apt-get install -y chromium-driver python3-selenium

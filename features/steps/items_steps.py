@@ -29,6 +29,6 @@ def step_impl(context):
             "quantity": int(row['quantity']),
             "price": float(row["price"])
         }
-        context.resp = requests.post(rest_endpoint, data = payload, headers = headers)
+        context.resp = requests.post(rest_endpoint, data=payload, headers=headers)
         expect(context.resp.status_code).to_equal(201)
     context.order_id = list()

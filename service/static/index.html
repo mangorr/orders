@@ -371,9 +371,9 @@
             well_container.style.height="150vh"
             var result_container = document.getElementById("search_results")
             result_container.style.display = "block";
-            that.show_in_fields(that.list_all)
-            $("#flash_message").val("");
             $("#flash_message").val("Success");
+            that.show_in_fields(that.list_all)
+            
         })
         ajax.fail(function (res) {
             $("#flash_message").val("");
@@ -411,8 +411,9 @@
             well_container.style.height="150vh"
             var result_container = document.getElementById("search_results")
             result_container.style.display = "block";
-            that.show_in_fields(that.list_all)
             $("#flash_message").val("Success");
+            that.show_in_fields(that.list_all)
+            
         })
         ajax.fail(function (res) {
             $("#flash_message").val(res.responseJSON.message);
@@ -485,8 +486,8 @@
             well_container_item.style.height="150vh"
             var result_container_item = document.getElementById("search_results_item")
             result_container_item.style.display = "block";
-            that.show_in_fields(that.list_all_item)
             $("#flash_message_item").val("Success");
+            that.show_in_fields(that.list_all_item)
         })
         ajax.fail(function (res) {
             $("#flash_message_item").val(res.responseJSON.message);

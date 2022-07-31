@@ -8,16 +8,16 @@ For information on Waiting until elements are present in the HTML see:
 """
 
 
-import json
+# import json
 import requests
-from behave import *
-from compare import expect, ensure
+from behave import given
+from compare import expect
+# , ensure
 
 
 @given(u'the following items')
 def step_impl(context):
     """ create new items """
-    
     headers = {'Content-Type': 'application/json'}
     for row in context.table:
         # print(row)
@@ -29,6 +29,6 @@ def step_impl(context):
             "quantity": int(row['quantity']),
             "price": float(row["price"])
         }
-        context.resp = requests.post(rest_endpoint, data=payload, headers= headers)
+        context.resp = requests.post(rest_endpoint, data = payload, headers = headers)
         expect(context.resp.status_code).to_equal(201)
     context.order_id = list()

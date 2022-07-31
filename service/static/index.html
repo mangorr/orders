@@ -34,7 +34,7 @@
           </div>
           <div id="Orders_container" style="margin:0px 10% 0px;background-color:#4e5d6c;">
             <!-- Flash Message -->
-            <div class="well" id="well-container" style="height: 82vh;">
+            <div class="well" id="well-container" style="height: 90vh;">
                 <div class="form-horizontal">
                     <div class="form-group">
                         <label class="control-label col-sm-2" >Status</label>
@@ -346,6 +346,15 @@
           item_div.style.display = "block"
         }
       },
+      show_in_fields(data){
+        if(data!=[]){
+            this.order_id = data[0].id
+            this.customer_id = data[0].customer_id
+            this.tracking_id = data[0].tracking_id
+            this.order_status = data[0].status
+            this.create_time = data[0].created_time
+        }
+      },
       // get order list
       getlist(){
         this.list_all = []
@@ -357,12 +366,12 @@
         })
         var that = this
         ajax.done(function (res) {
-            console.log(res)
             that.list_all = res
             var well_container = document.getElementById("well-container")
             well_container.style.height="150vh"
             var result_container = document.getElementById("search_results")
             result_container.style.display = "block";
+            that.show_in_fields(that.list_all)
             $("#flash_message").val("");
             $("#flash_message").val("Success");
         })
@@ -402,6 +411,7 @@
             well_container.style.height="150vh"
             var result_container = document.getElementById("search_results")
             result_container.style.display = "block";
+            that.show_in_fields(that.list_all)
             $("#flash_message").val("Success");
         })
         ajax.fail(function (res) {
@@ -410,7 +420,9 @@
       },
       // click row in the table
       retrieve_order(row){
+        console.log(row)
         if(row!=""){
+            console.log("here")
             this.order_id = row.id
             this.customer_id = row.customer_id
             this.tracking_id = row.tracking_id
@@ -473,6 +485,7 @@
             well_container_item.style.height="150vh"
             var result_container_item = document.getElementById("search_results_item")
             result_container_item.style.display = "block";
+            that.show_in_fields(that.list_all_item)
             $("#flash_message_item").val("Success");
         })
         ajax.fail(function (res) {

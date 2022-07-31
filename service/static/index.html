@@ -27,8 +27,8 @@
             <el-menu-item index="1" disabled style="cursor: default;opacity:inherit">
                 <img src="static/NYU_Long_RGB_White.png" style="width: 350px;" />
             </el-menu-item>
-            <el-menu-item index="2">Orders</el-menu-item>
-            <el-menu-item index="3">Items</el-menu-item>
+            <el-menu-item index="2" id = 'orders_page'>Orders</el-menu-item>
+            <el-menu-item index="3" id = 'items_page'>Items</el-menu-item>
             </el-menu>
             <br/>
           </div>
@@ -101,12 +101,12 @@
                     <div class="form-group">
                         <label class="control-label col-sm-2" for="query">Query</label>
                         <div class="col-sm-10">
-                            <input type="radio" id="cid" name="query_option" value="cid" style="margin-top:1.2%;">
-                            <label for="cid">Customer ID</label><br>
-                            <input type="radio" id="stat" name="query_option" value="stat">
-                            <label for="stat">Status</label><br>
-                            <input type="radio" id="pid" name="query_option" value="pid">
-                            <label for="pid">Product ID</label><br>
+                            <input type="radio" id="customer_id_query" name="query_option" value="cid" style="margin-top:1.2%;">
+                            <label for="customer_id_query">Customer ID</label><br>
+                            <input type="radio" id="status_query" name="query_option" value="stat">
+                            <label for="status_query">Status</label><br>
+                            <input type="radio" id="product_id_query" name="query_option" value="pid">
+                            <label for="product_id_query">Product ID</label><br>
                             <el-input id="query" v-model="query_value" placeholder="Enter query value" style="margin-bottom: 10px ;"></el-input>
                             <br>
                             <el-button type="primary" id="search-btn" @click="query_list">Search</button>
@@ -384,8 +384,8 @@
         }else if(ele[2].checked){
             data["product_id"] = $("#query").val();
         }else{
-            $("#flash_message").val("");
-            $("#flash_message").val("Please select one of the query type!");
+            //$("#flash_message").val("");
+            //$("#flash_message").val("Please select one of the query type!");
             return 
         }
 
@@ -402,11 +402,9 @@
             well_container.style.height="150vh"
             var result_container = document.getElementById("search_results")
             result_container.style.display = "block";
-            $("#flash_message").val("");
             $("#flash_message").val("Success");
         })
         ajax.fail(function (res) {
-            $("#flash_message").val("");
             $("#flash_message").val(res.responseJSON.message);
         });
       },
@@ -475,11 +473,9 @@
             well_container_item.style.height="150vh"
             var result_container_item = document.getElementById("search_results_item")
             result_container_item.style.display = "block";
-            $("#flash_message_item").val("");
             $("#flash_message_item").val("Success");
         })
         ajax.fail(function (res) {
-            $("#flash_message_item").val("");
             $("#flash_message_item").val(res.responseJSON.message);
         });
       },

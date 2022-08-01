@@ -34,7 +34,7 @@
           </div>
           <div id="Orders_container" style="margin:0px 10% 0px;background-color:#4e5d6c;">
             <!-- Flash Message -->
-            <div class="well" id="well-container" style="height: 82vh;">
+            <div class="well" id="well-container" style="height: 90vh;">
                 <div class="form-horizontal">
                     <div class="form-group">
                         <label class="control-label col-sm-2" >Status</label>
@@ -357,14 +357,17 @@
         })
         var that = this
         ajax.done(function (res) {
-            console.log(res)
             that.list_all = res
             var well_container = document.getElementById("well-container")
             well_container.style.height="150vh"
             var result_container = document.getElementById("search_results")
             result_container.style.display = "block";
-            $("#flash_message").val("");
             $("#flash_message").val("Success");
+            $("#order_id").val(res[0].id)
+            $("#customer_id").val(res[0].customer_id)
+            $("#tracking_id").val(res[0].tracking_id)
+            $("#order_status").val(res[0].order_status)
+            $("#create_time").val(res[0].created_time)
         })
         ajax.fail(function (res) {
             $("#flash_message").val("");
@@ -403,6 +406,12 @@
             var result_container = document.getElementById("search_results")
             result_container.style.display = "block";
             $("#flash_message").val("Success");
+            $("#order_id").val(res[0].id)
+            $("#customer_id").val(res[0].customer_id)
+            $("#tracking_id").val(res[0].tracking_id)
+            $("#order_status").val(res[0].order_status)
+            $("#create_time").val(res[0].created_time)
+            
         })
         ajax.fail(function (res) {
             $("#flash_message").val(res.responseJSON.message);
@@ -411,11 +420,11 @@
       // click row in the table
       retrieve_order(row){
         if(row!=""){
-            this.order_id = row.id
-            this.customer_id = row.customer_id
-            this.tracking_id = row.tracking_id
-            this.order_status = row.status
-            this.create_time = row.created_time
+            $("#order_id").val(row.id)
+            $("#customer_id").val(row.customer_id)
+            $("#tracking_id").val(row.tracking_id)
+            $("#order_status").val(row.order_status)
+            $("#create_time").val(row.created_time)
         }
         this.toogleExpand(row)
       },
@@ -474,6 +483,11 @@
             var result_container_item = document.getElementById("search_results_item")
             result_container_item.style.display = "block";
             $("#flash_message_item").val("Success");
+            $("#item_id").val(res[0].id)
+            $("#item_order_id").val(res[0].order_id)
+            $("#product_id").val(res[0].product_id)
+            $("#quantity").val(res[0].quantity)
+            $("#price").val(res[0].price)
         })
         ajax.fail(function (res) {
             $("#flash_message_item").val(res.responseJSON.message);
@@ -482,11 +496,11 @@
       // click row in the table
       retrieve_item(row){
         if(row!=""){
-            this.item_id = row.id
-            this.item_order_id = row.order_id
-            this.product_id = row.product_id
-            this.quantity = row.quantity
-            this.price = row.price
+            $("#item_id").val(row.id)
+            $("#item_order_id").val(row.order_id)
+            $("#product_id").val(row.product_id)
+            $("#quantity").val(row.quantity)
+            $("#price").val(row.price)
         }
       },
       // sort

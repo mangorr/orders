@@ -44,3 +44,20 @@ Scenario: Create a new Order
     Then I should see "1234" in the "Customer_ID" field
     And I should see "0" in the "Tracking ID" field
     And I should see "PAID" in the "Status" dropdown
+
+Scenario: Delete an Order
+    When I visit the "Home Page"
+    And I check "Customer ID" in the "Query" Area
+    And I set the "query" to "4666"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "0" in the "Tracking ID" field
+    And I should see "PLACED" in the "Status" dropdown
+    When I press the "Delete" button
+    Then I should see the message "Order has been Deleted!"
+    When I check "Customer ID" in the "Query" Area
+    And I set the "query" to "4666"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should not see "4666" in the results
+    

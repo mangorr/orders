@@ -105,3 +105,21 @@ Scenario: Query orders by Status
     And I should see "4666" in the results
     And I should see "0" in the results
     And I should not see "404 Not Found"
+
+Scenario: Read an Order
+    When I visit the "Home Page"
+    And I check the "Customer ID" in the "Query" Area
+    And I set the "query" to "4666"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "0" in the "Tracking ID" field
+    And I should see "PLACED" in the "Status" dropdown
+    When I copy the "Order Id" field
+    And I press the "Clear" button
+    And I paste the "Order Id" field
+    And I press the "Retrieve" button
+    Then I should see the message "Success"
+    And I should see "0" in the "Tracking ID" field
+    And I should see "PLACED" in the "Status" dropdown
+    And I should see "4666" in the "Customer ID" field
+    And I should not see "404 Not Found"

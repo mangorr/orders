@@ -11,9 +11,9 @@ Background:
        | 4666        | 0000        | 2022-07-01   | PLACED  |
     # Given the following items
     #    | order_id    | product_id  | quantity     | price   |
-    #    | 0           | 6447        | 6            | 32      |
-    #    | 0           | 2343        | 1            | 16      |
-    #    | 2           | 5354        | 5            | 21      |
+    #    | 1000           | 6447        | 6            | 32      |
+    #    | 1000           | 2343        | 1            | 16      |
+    #    | 1020           | 5354        | 5            | 21      |
 
 
 Scenario: The server is running
@@ -23,7 +23,7 @@ Scenario: The server is running
 
 Scenario: Create a new Order
     When I visit the "Home Page"
-    And I check "Customer ID" in the "Query" Area
+    And I check the "Customer ID" in the "Query" Area
     And I set the "query" to "1234"
     And I press the "Search" button
     Then I should see the message "Success"
@@ -47,7 +47,7 @@ Scenario: Create a new Order
 
 Scenario: Delete an Order
     When I visit the "Home Page"
-    And I check "Customer ID" in the "Query" Area
+    And I check the "Customer ID" in the "Query" Area
     And I set the "query" to "4666"
     And I press the "Search" button
     Then I should see the message "Success"
@@ -55,9 +55,32 @@ Scenario: Delete an Order
     And I should see "PLACED" in the "Status" dropdown
     When I press the "Delete" button
     Then I should see the message "Order has been Deleted!"
-    When I check "Customer ID" in the "Query" Area
+    When I check the "Customer ID" in the "Query" Area
     And I set the "query" to "4666"
     And I press the "Search" button
     Then I should see the message "Success"
     And I should not see "4666" in the results
+
+Scenario: Query orders by customer ID
+    When I visit the "Home Page"
+    And I check the "Customer ID" in the "Query" Area
+    And I set the "query" to "4774"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "4774" in the results
+    And I should see "4798" in the results
+    And I should see "SHIPPED" in the results
+    And I should see "SHIPPED" in the "Status" dropdown
+    And I should not see "404 Not Found"
+    And I should not see "4666" in the results    And I should not see "2333" in the results
     
+Scenario: Query orders by Status
+    When I visit the "Home Page"
+    And I check the "Status" in the "Query" Area
+    And I set the "query" to "PLACED"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "2333" in the results
+    And I should see "4666" in the results
+    And I should see "0" in the results
+    And I should not see "404 Not Found"

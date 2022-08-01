@@ -58,7 +58,7 @@ def step_impl(context, text_string):
 # use for checking the option in Query
 # text: Customer ID; element_name: Query
 # eg. id -> customer_id_query
-@when('I check "{text}" in the "{element_name}" Area')
+@when('I check the "{text}" in the "{element_name}" Area')
 def step_impl(context, text, element_name):
     element_id = text.lower().replace(' ', '_') + '_' + element_name.lower()
     element = context.driver.find_element_by_id(element_id)

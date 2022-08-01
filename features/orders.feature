@@ -61,6 +61,27 @@ Scenario: Delete an Order
     Then I should see the message "Success"
     And I should not see "4666" in the results
 
+Scenario: Update a Order
+    When I visit the "Home Page"
+    And I check the "Customer ID" in the "Query" Area
+    And I set the "query" to "2333"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "0" in the "Tracking ID" field
+    And I should see "PLACED" in the "Status" dropdown
+    When I change "Tracking ID" to "556612"
+    And I select "SHIPPED" in the "Status" dropdown
+    And I press the "Update" button
+    Then I should see the message "Success"
+    When I copy the "Order Id" field
+    And I press the "Clear" button
+    And I paste the "Order Id" field
+    And I press the "Retrieve" button
+    Then I should see "556612" in the "Tracking ID" field
+    When I press the "Clear" button
+    And I press the "List" button
+    Then I should see "556612" in the results
+
 Scenario: Query orders by customer ID
     When I visit the "Home Page"
     And I check the "Customer ID" in the "Query" Area

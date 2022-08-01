@@ -25,6 +25,7 @@ For information on Waiting until elements are present in the HTML see:
     https://selenium-python.readthedocs.io/waits.html
 """
 import logging
+import time
 from behave import when, then
 from compare import expect, ensure
 from selenium.webdriver.common.by import By
@@ -74,7 +75,9 @@ def step_impl(context, element_id, text_string):
 @when('I select "{text}" in the "{element_name}" dropdown')
 def step_impl(context, text, element_name):
     element_id = element_name.lower().replace(' ', '_')
-    context.driver.find_element_by_id(element_id).click()
+    WebDriverWait(context.driver, context.WAIT_SECONDS).until(
+        expected_conditions.presence_of_element_located((By.ID, element_id))
+    )
     lis = context.driver.find_elements_by_xpath(
         "//ul[@class='el-scrollbar__view el-select-dropdown__list']/li")
 
@@ -87,7 +90,10 @@ def step_impl(context, text, element_name):
 @then('I should see "{text}" in the "{element_name}" dropdown')
 def step_impl(context, text, element_name):
     element_id = element_name.lower().replace(' ', '_')
-    context.driver.find_element_by_id(element_id).click()
+    # context.driver.find_element_by_id(element_id).click()
+    WebDriverWait(context.driver, context.WAIT_SECONDS).until(
+        expected_conditions.presence_of_element_located((By.ID, element_id))
+    )
     lis = context.driver.find_elements_by_xpath(
         "//ul[@class='el-scrollbar__view el-select-dropdown__list']/li")
 

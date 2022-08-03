@@ -23,6 +23,7 @@ For information on Waiting until elements are present in the HTML see:
     https://selenium-python.readthedocs.io/waits.html
 """
 
+import json
 import requests
 from behave import given
 from compare import expect
@@ -32,6 +33,7 @@ from compare import expect
 def step_impl(context):
     """ Delete all Orders and load new ones """
     # List all of the pets and delete them one by one
+    context.order_ids = list()
     rest_endpoint = f"{context.BASE_URL}/orders"
     context.resp = requests.get(rest_endpoint)
     expect(context.resp.status_code).to_equal(200)
@@ -49,4 +51,5 @@ def step_impl(context):
             "order_items": list()
         }
         context.resp = requests.post(rest_endpoint, json=payload)
+        context.order_ids.append(context.resp.json()["id"])
         expect(context.resp.status_code).to_equal(201)

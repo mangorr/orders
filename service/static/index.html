@@ -97,7 +97,6 @@
                         </div>
                     </div>
 
-
                     <div class="form-group">
                         <label class="control-label col-sm-2" for="query">Query</label>
                         <div class="col-sm-10" id = "search">
@@ -281,7 +280,6 @@
 </body>
 
 
-
 <script>
   new Vue({
     el:"#app",
@@ -368,7 +366,7 @@
             $("#customer_id").val(res[0].customer_id)
             $("#tracking_id").val(res[0].tracking_id)
             $("#order_status").val(res[0].order_status)
-            $("#create_time").val(res[0].created_time)
+            $("#created_time").val(res[0].created_time)
         })
         ajax.fail(function (res) {
             $("#flash_message").val("");
@@ -416,7 +414,7 @@
             $("#customer_id").val(res[0].customer_id)
             $("#tracking_id").val(res[0].tracking_id)
             $("#order_status").val(res[0].order_status)
-            $("#create_time").val(res[0].created_time)
+            $("#created_time").val(res[0].created_time)
             
         })
         ajax.fail(function (res) {
@@ -430,7 +428,7 @@
             $("#customer_id").val(row.customer_id)
             $("#tracking_id").val(row.tracking_id)
             $("#order_status").val(row.order_status)
-            $("#create_time").val(row.created_time)
+            $("#created_time").val(row.created_time)
         }
         this.toogleExpand(row)
       },
@@ -559,5 +557,3 @@
   }
 </style>
 </html>
-
-

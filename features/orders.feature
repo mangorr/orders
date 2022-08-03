@@ -10,11 +10,11 @@ Background:
        | 2333        | 0000        | 2022-07-21   | PLACED  |
        | 4666        | 0000        | 2022-07-01   | PLACED  |
        | 9898        | 3434        | 2022-08-01   | DELIVERED  |
-    # Given the following items
-    #    | order_id    | product_id  | quantity     | price   |
-    #    | 1000           | 6447        | 6            | 32      |
-    #    | 1000           | 2343        | 1            | 16      |
-    #    | 1020           | 5354        | 5            | 21      |
+    Given the following items
+       | order_id_index    | product_id  | quantity     | price   |
+       | 0           | 6447        | 6            | 32      |
+       | 0           | 2343        | 1            | 16      |
+       | 2           | 5354        | 5            | 21      |
 
 
 Scenario: The server is running

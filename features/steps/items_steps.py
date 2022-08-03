@@ -8,9 +8,10 @@ For information on Waiting until elements are present in the HTML see:
 """
 
 
-# import json
+import json
 import requests
-from behave import given
+# from behave import given
+from behave import *
 from compare import expect
 # , ensure
 
@@ -20,15 +21,16 @@ def step_impl(context):
     """ create new items """
     headers = {'Content-Type': 'application/json'}
     for row in context.table:
-        # print(row)
-        rest_endpoint = f"{context.BASE_URL}/orders/{int(row['order_id'])}/items"
-        # rest_endpoint = context.BASE_URL + "/orders/{}/items".format(row[0])
+        order_id = context.order_ids[int(row["order_id_index"])]
+        # rest_endpoint = f"{context.BASE_URL}/orders/{int(row['order_id'])}/items"
+        rest_endpoint = context.BASE_URL + "/orders/{}/items".format(order_id)
+        # rest_endpoint = f"{context.BASE_URL}/orders/{int(order_id)}/items"
         payload = {
-            "order_id": int(row['order_id']),
+            "order_id": order_id,
             "product_id": int(row['product_id']),
             "quantity": int(row['quantity']),
             "price": float(row["price"])
         }
-        context.resp = requests.post(rest_endpoint, data=payload, headers=headers)
+        context.resp = requests.post(rest_endpoint, json=payload, headers=headers)
         expect(context.resp.status_code).to_equal(201)
-    context.order_id = list()
+    context.order_ids = list()

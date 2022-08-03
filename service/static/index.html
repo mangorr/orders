@@ -37,7 +37,7 @@
             <div class="well" id="well-container" style="height: 90vh;">
                 <div class="form-horizontal">
                     <div class="form-group">
-                        <label class="control-label col-sm-2" >Status</label>
+                        <label class="control-label col-sm-2" >Operation Status</label>
                         <div class="col-sm-10">
                             <el-input id="flash_message" v-model="flash_message" :readonly="true"></el-input>
                         </div>
@@ -365,7 +365,7 @@
             $("#order_id").val(res[0].id)
             $("#customer_id").val(res[0].customer_id)
             $("#tracking_id").val(res[0].tracking_id)
-            $("#order_status").val(res[0].order_status)
+            $("#status").val(res[0].status)
             $("#created_time").val(res[0].created_time)
         })
         ajax.fail(function (res) {
@@ -405,6 +405,7 @@
         
         ajax.done(function (res) {
             that.list_all = res
+            console.log(res)
             var well_container = document.getElementById("well-container")
             well_container.style.height="150vh"
             var result_container = document.getElementById("search_results")
@@ -413,7 +414,7 @@
             $("#order_id").val(res[0].id)
             $("#customer_id").val(res[0].customer_id)
             $("#tracking_id").val(res[0].tracking_id)
-            $("#order_status").val(res[0].order_status)
+            $("#status").val(res[0].status)
             $("#created_time").val(res[0].created_time)
             
         })
@@ -427,7 +428,7 @@
             $("#order_id").val(row.id)
             $("#customer_id").val(row.customer_id)
             $("#tracking_id").val(row.tracking_id)
-            $("#order_status").val(row.order_status)
+            $("#status").val(row.status)
             $("#created_time").val(row.created_time)
         }
         this.toogleExpand(row)

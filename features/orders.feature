@@ -10,6 +10,7 @@ Background:
        | 2333        | 0000        | 2022-07-21   | PLACED  |
        | 4666        | 0000        | 2022-07-01   | PLACED  |
        | 9898        | 3434        | 2022-08-01   | DELIVERED  |
+       | 7479        | 0000        | 2022-08-02   | PLACED  |
     Given the following items
        | order_id_index    | product_id  | quantity     | price   |
        | 0           | 6447        | 6            | 32      |
@@ -80,6 +81,22 @@ Scenario: Read an Order
     And I should see "4666" in the "Customer ID" field
     And I should not see "404 Not Found"
 
+Scenario: Cancel an order
+        When I visit the "Home Page"
+        And I check the "Customer ID" in the "Query" Area
+        And I set the "query" to "7479"
+        And I press the "Search" button
+        Then I should see the message "Success"
+        And I should see "0" in the "Tracking ID" field
+        And I should see "PLACED" in the "Status" dropdown
+        When I press the "Cancel" button
+        Then I should see the message "Order has been CANCELLED!"
+        When I check the "Customer ID" in the "Query" Area
+        And I set the "query" to "7479"
+        And I press the "Search" button
+        Then I should see the message "Success"
+        And I should see "CANCELLED" in the "Status" dropdown
+
 Scenario: List all orders
     When I visit the "Home Page"
     And I press the "List" button
@@ -93,6 +110,9 @@ Scenario: List all orders
     And I should see "9898" in the results
     And I should see "3434" in the results
     And I should see "DELIVERED" in the results
+    And I should see "7479" in the results
+    And I should see "0" in the results
+    And I should see "PLACED" in the results
     And I should not see "989877" in the results
     And I should not see "343434" in the results
     And I should not see "CANCELLED" in the results

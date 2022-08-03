@@ -9,6 +9,7 @@ Background:
        | 4774        | 4798        | 2022-07-30   | SHIPPED |
        | 2333        | 0000        | 2022-07-21   | PLACED  |
        | 4666        | 0000        | 2022-07-01   | PLACED  |
+       | 9898        | 3434        | 2022-08-01   | DELIVERED  |
     # Given the following items
     #    | order_id    | product_id  | quantity     | price   |
     #    | 1000           | 6447        | 6            | 32      |
@@ -61,6 +62,41 @@ Scenario: Delete an Order
     Then I should see the message "Success"
     And I should not see "4666" in the results
 
+Scenario: Read an Order
+    When I visit the "Home Page"
+    And I check the "Customer ID" in the "Query" Area
+    And I set the "query" to "4666"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "0" in the "Tracking ID" field
+    And I should see "PLACED" in the "Status" dropdown
+    When I copy the "Order Id" field
+    And I press the "Clear" button
+    And I paste the "Order Id" field
+    And I press the "Retrieve" button
+    Then I should see the message "Success"
+    And I should see "0" in the "Tracking ID" field
+    And I should see "PLACED" in the "Status" dropdown
+    And I should see "4666" in the "Customer ID" field
+    And I should not see "404 Not Found"
+
+Scenario: List all orders
+    When I visit the "Home Page"
+    And I press the "List" button
+    Then I should see the message "Success"
+    And I should see "4774" in the results
+    And I should see "4798" in the results
+    And I should see "SHIPPED" in the results
+    And I should see "2333" in the results
+    And I should see "0" in the results
+    And I should see "PLACED" in the results
+    And I should see "9898" in the results
+    And I should see "3434" in the results
+    And I should see "DELIVERED" in the results
+    And I should not see "989877" in the results
+    And I should not see "343434" in the results
+    And I should not see "CANCELLED" in the results
+
 Scenario: Update a Order
     When I visit the "Home Page"
     And I check the "Customer ID" in the "Query" Area
@@ -104,22 +140,4 @@ Scenario: Query orders by Status
     And I should see "2333" in the results
     And I should see "4666" in the results
     And I should see "0" in the results
-    And I should not see "404 Not Found"
-
-Scenario: Read an Order
-    When I visit the "Home Page"
-    And I check the "Customer ID" in the "Query" Area
-    And I set the "query" to "4666"
-    And I press the "Search" button
-    Then I should see the message "Success"
-    And I should see "0" in the "Tracking ID" field
-    And I should see "PLACED" in the "Status" dropdown
-    When I copy the "Order Id" field
-    And I press the "Clear" button
-    And I paste the "Order Id" field
-    And I press the "Retrieve" button
-    Then I should see the message "Success"
-    And I should see "0" in the "Tracking ID" field
-    And I should see "PLACED" in the "Status" dropdown
-    And I should see "4666" in the "Customer ID" field
     And I should not see "404 Not Found"

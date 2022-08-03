@@ -100,7 +100,7 @@
 
                     <div class="form-group">
                         <label class="control-label col-sm-2" for="query">Query</label>
-                        <div class="col-sm-10">
+                        <div class="col-sm-10" id = "search">
                             <input type="radio" id="customer_id_query" name="query_option" value="cid" style="margin-top:1.2%;">
                             <label for="customer_id_query">Customer ID</label><br>
                             <input type="radio" id="status_query" name="query_option" value="stat">
@@ -109,7 +109,8 @@
                             <label for="product_id_query">Product ID</label><br>
                             <el-input id="query" v-model="query_value" placeholder="Enter query value" style="margin-bottom: 10px ;"></el-input>
                             <br>
-                            <el-button type="primary" id="search-btn" @click="query_list">Search</button>
+                            <el-button type="primary" id="search-btn" @click="query_list">Search</el-button>
+                            <div id="search-btn-note"></div>
                         </div>
                     </div>
                 </div> <!-- form div -->
@@ -382,11 +383,16 @@
         var data={}
         if (ele[0].checked) {
             data["customer_id"] = $("#query").val();
+            $("#search-btn-note").empty();
         }else if(ele[1].checked) {
             data["status"] = $("#query").val();
+            $("#search-btn-note").empty();
         }else if(ele[2].checked){
             data["product_id"] = $("#query").val();
+            $("#search-btn-note").empty();
         }else{
+            $("#search-btn-note").empty();
+            $("#search-btn-note").append('Please select one of the query type!');
             //$("#flash_message").val("");
             //$("#flash_message").val("Please select one of the query type!");
             return 

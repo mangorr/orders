@@ -4,14 +4,33 @@ Package for the application models and service routes
 This module creates and configures the Flask app and sets up the logging
 and SQL database
 """
+import os
 import sys
+import logging
 from flask import Flask
+from flask_restx import Api
 from service import config
 from .utils import log_handlers
 
 # Create Flask application
 app = Flask(__name__)
-app.config.from_object(config)
+
+app.url_map.strict_slashes = False
+
+app.config['LOGGING_LEVEL'] = logging.INFO
+
+
+######################################################################
+# Configure Swagger before initializing it
+######################################################################
+api = Api(app,
+          version='1.0.0',
+          title='Order REST API Service',
+          description='This is a sample order server @ NYU-DevOps 2022 Summer Orders Team.',
+          default='orders',
+          default_label='Order operations',
+          doc='/apidocs',  # default also could use doc='/apidocs/'
+          prefix='/api')
 
 # Dependencies require we import the routes AFTER the Flask app is created
 # pylint: disable=wrong-import-position, wrong-import-order

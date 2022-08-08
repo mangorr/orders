@@ -243,7 +243,7 @@ class Order(db.Model, PersistentBase):
         :rtype: list
 
         """
-        logger.info("Processing status query for %s ...", status.name)
+        logger.info("Processing status query for %s ...", status)
         return cls.query.filter(cls.status == status)
 
     @classmethod

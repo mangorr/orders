@@ -352,7 +352,7 @@
 
         var ajax = $.ajax({
             type: "GET",
-            url: "/orders",
+            url: "/api/orders",
             data:''
         })
         var that = this
@@ -400,7 +400,7 @@
         var that = this
         var ajax = $.ajax({
             type: "GET",
-            url: "/orders",
+            url: "/api/orders",
             data: data
         })
         
@@ -477,7 +477,7 @@
         var order_id = $("#item_order_id").val();
         var ajax = $.ajax({
             type: "GET",
-            url: `/orders/${order_id}/items`,
+            url: `/api/orders/${order_id}/items`,
             data:''
         })
 

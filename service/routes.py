@@ -49,7 +49,8 @@ create_order_model = api.model('Order', {
                                   description='The Customer ID of the order'),
     'tracking_id': fields.Integer(required=True,
                                   description='The Tracking ID of the order'),
-    'status': fields. String(enum=OrderStatus._member_names_, description='The Status of the order'),
+    'status': fields. String(enum=OrderStatus._member_names_,
+                             description='The Status of the order'),
 })
 
 order_model = api.inherit(
@@ -89,7 +90,8 @@ item_model = api.inherit(
 order_args = reqparse.RequestParser()
 order_args.add_argument('customer_id', type=int, required=False, help='List Orders by customer_id')
 order_args.add_argument('status', type=str, required=False, help='List Orders by status')
-order_args.add_argument('product_id', type=int, required=False, help='List Orders by Item\'s product_id')
+order_args.add_argument('product_id', type=int, required=False,
+                        help='List Orders by Item\'s product_id')
 
 
 # ---------------------------------------------------------------------

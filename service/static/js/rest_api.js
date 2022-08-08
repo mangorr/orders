@@ -54,7 +54,7 @@ $(function () {
 
         var ajax = $.ajax({
             type: "POST",
-            url: "/orders",
+            url: "/api/orders",
             contentType: "application/json",
             data: JSON.stringify(data),
         });
@@ -92,7 +92,7 @@ $(function () {
 
         var ajax = $.ajax({
             type: "PUT",
-            url: `/orders/${order_id}`,
+            url: `/api/orders/${order_id}`,
             contentType: "application/json",
             data: JSON.stringify(data)
         })
@@ -119,7 +119,7 @@ $(function () {
 
         var ajax = $.ajax({
             type: "GET",
-            url: `/orders/${order_id}`,
+            url: `/api/orders/${order_id}`,
             contentType: "application/json",
             data: ''
         })
@@ -148,7 +148,7 @@ $(function () {
 
         var ajax = $.ajax({
             type: "DELETE",
-            url: `/orders/${order_id}`,
+            url: `/api/orders/${order_id}`,
             contentType: "application/json",
             data: '',
         })
@@ -174,7 +174,7 @@ $(function () {
 
         var ajax = $.ajax({
             type: "PUT",
-            url: `/orders/${order_id}/cancel`,
+            url: `/api/orders/${order_id}/cancel`,
             contentType: "application/json",
             data: '',
         })
@@ -199,118 +199,6 @@ $(function () {
         $("#flash_message").val("");
         clear_form_data()
     });
-
-    // ****************************************
-    // List all Orders
-    // ****************************************
-
-    // $("#listall-btn").click(function () {
-
-    //     var ajax = $.ajax({
-    //         type: "GET",
-    //         url: "/api/orders",
-    //         data: ''
-    //     })
-
-    //     ajax.done(function (res) {
-    //         //alert(res.toSource())
-    //         $("#search_results").empty();
-    //         $("#search_results").append('<table class="table-striped" cellpadding="10">');
-    //         var header = '<tr>'
-    //         header += '<th style="width:10%">ID</th>'
-    //         header += '<th style="width:40%">customer_id</th>'
-    //         header += '<th style="width:40%">tracking_id</th>'
-    //         header += '<th style="width:10%">status</th></tr>'
-    //         $("#search_results").append(header);
-    //         var firstOrder = "";
-    //         for (var i = 0; i < res.length; i++) {
-    //             var order = res[i];
-    //             var row = "<tr><td>" + order.id + "</td><td>" + order.customer_id + "</td><td>" + order.tracking_id + "</td><td>" + order.status + "</td></tr>";
-    //             $("#search_results").append(row);
-    //             if (i == 0) {
-    //                 firstOrder = order;
-    //             }
-    //         }
-
-    //         $("#search_results").append('</table>');
-
-    //         // copy the first result to the form
-    //         if (firstOrder != "") {
-    //             update_form_data(firstOrder)
-    //         }
-
-    //         flash_message("Success")
-    //     });
-
-    //     ajax.fail(function (res) {
-    //         flash_message(res.responseJSON.message)
-    //     });
-
-    // });
-
-    // // ****************************************
-    // // Search Query String
-    // // ****************************************
-
-    // $("#search-btn").click(function () {
-
-    //     var ele = document.getElementsByName('query_option');
-    //     var queryString = ""
-
-    //     var data={}
-    //     if (ele[0].checked) {
-    //         data["customer_id"] = $("#query").val();
-    //     }else if(ele[1].checked) {
-    //         data["status"] = $("#query").val();
-    //     }else if(ele[2].checked){
-    //         data["product_id"] = $("#query").val();
-    //     }else{
-    //         flash_message("Please select one of the query type!")
-    //         return 
-    //     }
-
-    //     var ajax = $.ajax({
-    //         type: "GET",
-    //         url: "/orders",
-    //         data: JSON.stringify(data)
-    //     })
-
-    //     ajax.done(function (res) {
-    //         //alert(res.toSource())
-    //         $("#search_results").empty();
-    //         $("#search_results").append('<table class="table-striped" cellpadding="10">');
-    //         var header = '<tr>'
-    //         header += '<th style="width:10%">ID</th>'
-    //         header += '<th style="width:40%">customer_id</th>'
-    //         header += '<th style="width:40%">tracking_id</th>'
-    //         header += '<th style="width:10%">status</th></tr>'
-    //         $("#search_results").append(header);
-    //         var firstOrder = "";
-    //         for (var i = 0; i < res.length; i++) {
-    //             var order = res[i];
-    //             var row = "<tr><td>" + order.id + "</td><td>" + order.customer_id + "</td><td>" + order.tracking_id + "</td><td>" + order.status + "</td></tr>";
-    //             $("#search_results").append(row);
-    //             if (i == 0) {
-    //                 firstOrder = order;
-    //             }
-    //         }
-
-    //         $("#search_results").append('</table>');
-
-    //         // copy the first result to the form
-    //         if (firstOrder != "") {
-    //             update_form_data(firstOrder)
-    //         }
-
-    //         flash_message("Success")
-    //     });
-
-    //     ajax.fail(function (res) {
-    //         flash_message(res.responseJSON.message)
-    //     });
-
-    // });
-
 
     // ****************************************************
     // O R D E R   I T E M S
@@ -365,7 +253,7 @@ $(function () {
 
         var ajax = $.ajax({
             type: "POST",
-            url: `/orders/${order_id}/items`,
+            url: `/api/orders/${order_id}/items`,
             contentType: "application/json",
             data: JSON.stringify(data),
         });
@@ -404,7 +292,7 @@ $(function () {
 
         var ajax = $.ajax({
             type: "PUT",
-            url: `/orders/${order_id}/items/${item_id}`,
+            url: `/api/orders/${order_id}/items/${item_id}`,
             contentType: "application/json",
             data: JSON.stringify(data)
         })
@@ -432,7 +320,7 @@ $(function () {
 
         var ajax = $.ajax({
             type: "GET",
-            url: `/orders/${order_id}/items/${item_id}`,
+            url: `/api/orders/${order_id}/items/${item_id}`,
             contentType: "application/json",
             data: ''
         })
@@ -462,7 +350,7 @@ $(function () {
 
         var ajax = $.ajax({
             type: "DELETE",
-            url: `/orders/${order_id}/items/${item_id}`,
+            url: `/api/orders/${order_id}/items/${item_id}`,
             contentType: "application/json",
             data: '',
         })
@@ -489,64 +377,5 @@ $(function () {
         clear_item_form_data()
     });
 
-    // ****************************************
-    // List all Items
-    // ****************************************
-
-    $("#listall-item-btn").click(function () {
-
-        var order_id = $("#orderid").val();
-        if (order_id != "") {
-            var u = "/api/orders/" + order_id + "/items";
-        }
-        else {
-            var u = "/api/items";
-        }
-
-
-        var ajax = $.ajax({
-            type: "GET",
-            url: u,
-            contentType: "application/json",
-            data: ''
-        })
-
-        ajax.done(function (res) {
-            //alert(res.toSource())
-            $("#search_item_results").empty();
-            $("#search_item_results").append('<table class="table-striped" cellpadding="10">');
-            var header = '<tr>'
-            header += '<th style="width:10%">Item ID</th>'
-            header += '<th style="width:30%">Product_id</th>'
-            header += '<th style="width:30%">quantity</th>'
-            header += '<th style="width:10%">Price</th>'
-            header += '<th style="width:20%">Order ID</th></tr>'
-
-            $("#search_item_results").append(header);
-            var firstOrder = "";
-            for (var i = 0; i < res.length; i++) {
-                var order = res[i];
-                var row = "<tr><td>" + order.id + "</td><td>" + order.product_id + "</td><td>" + order.quantity + "</td><td>" + order.price + "</td><td>" + order.order_id + "</td></tr>";
-                $("#search_item_results").append(row);
-                if (i == 0) {
-                    firstOrder = order;
-                }
-            }
-
-            $("#search_item_results").append('</table>');
-
-            // copy the first result to the form
-            if (firstOrder != "") {
-                update_item_form_data(firstOrder)
-            }
-
-            flash_item_message("Success")
-        });
-
-        ajax.fail(function (res) {
-            flash_item_message(res.responseJSON.message)
-        });
-
-    });
-
+    
 })

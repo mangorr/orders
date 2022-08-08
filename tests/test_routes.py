@@ -18,7 +18,7 @@ from service.models import db, Order, init_db, OrderStatus
 from tests.factories import OrderFactory, ItemFactory
 from service.utils import status  # HTTP Status Codes
 
-BASE_URL = "/orders"
+BASE_URL = "/api/orders"
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/postgres"
@@ -165,11 +165,11 @@ class Test(TestCase):
     def test_create_orders_wrong_content_type(self):
         """ It should not Create an Order with wrong content type """
         order = OrderFactory()
-        resp = self.app.post('/orders',
+        resp = self.app.post(BASE_URL,
                              json=order.serialize(),
                              content_type='application/xml')
 
-        self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_order_no_data(self):
         """It should not Create an Order with missing data"""
@@ -226,9 +226,11 @@ class Test(TestCase):
         new_order["tracking_id"] = 8888
         new_order["status"] = OrderStatus.PAID.name
         resp = self.app.put(f"{BASE_URL}/{new_order_id}", json=new_order)
-
+        print("3333")
         resp = self.app.put(f"{BASE_URL}/{new_order_id}/cancel", json=new_order)
+        print("2222")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        print("1111")
         updated_order = resp.get_json()
         self.assertEqual(updated_order["customer_id"], 9999)
         self.assertEqual(updated_order["tracking_id"], 8888)

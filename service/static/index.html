@@ -273,6 +273,7 @@
             </div>
           </div>
           <div class="footer">
+            <p style="color: #000000;text-align:center">API Documentation is <a href='/apidocs'>here</a></p>
             <p style="color: #000000;text-align:center">Summer 2022 Orders team @ NYU Devops and Agile</p> 
           </div>
         </div>
@@ -351,7 +352,7 @@
 
         var ajax = $.ajax({
             type: "GET",
-            url: "/orders",
+            url: "/api/orders",
             data:''
         })
         var that = this
@@ -399,7 +400,7 @@
         var that = this
         var ajax = $.ajax({
             type: "GET",
-            url: "/orders",
+            url: "/api/orders",
             data: data
         })
         
@@ -476,7 +477,7 @@
         var order_id = $("#item_order_id").val();
         var ajax = $.ajax({
             type: "GET",
-            url: `/orders/${order_id}/items`,
+            url: `/api/orders/${order_id}/items`,
             data:''
         })
 

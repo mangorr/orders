@@ -271,7 +271,6 @@ class CancelResource(Resource):
         order.id = order_id
         order.update()
         app.logger.info('Order with id [%s] has been cancelled!', order.id)
-        print("here!")
         return order.serialize(), status.HTTP_200_OK
 
 
@@ -377,7 +376,7 @@ class ItemCollection(Resource):
     # ------------------------------------------------------------------
     @api.doc('list_items')
     @api.response(404, 'Order not found')
-    @api.marshal_list_with(order_model)
+    @api.marshal_list_with(item_model)
     def get(self, order_id):
         """Returns all of the Items for an order"""
         app.logger.info("Request for all Items for Order with id: %s", order_id)

@@ -17,35 +17,38 @@ Background:
        | 0           | 2343        | 1            | 16      |
        | 2           | 5354        | 5            | 21      |
 
-
 Scenario: The server is running
     When I visit the "Home Page"
     Then I should see "Order REST API Service" in the title
     And I should not see "404 Not Found"
 
-Scenario: Create a new Order
+Scenario: Create a new Item
     When I visit the "Home Page"
-    And I check the "Customer ID" in the "Query" Area
-    And I set the "query" to "1234"
-    And I press the "Search" button
-    Then I should see the message "Success"
-    And I should not see "1234" in the results    
-    When I press the "Clear" button
-    And I set the "Customer ID" to "1234"
-    And I set the "Tracking ID" to "0"
-    And I select "PAID" in the "Status" dropdown
-    And I press the "Create" button
-    Then I should see the message "Success"
-    When I copy the "Order ID" field
-    And I press the "Clear" button
-    Then the "Order ID" field should be empty
-    And the "Customer_ID" field should be empty
-    And the "Tracking ID" field should be empty
-    When I paste the "Order ID" field
-    And I press the "Retrieve" button
-    Then I should see "1234" in the "Customer_ID" field
-    And I should see "0" in the "Tracking ID" field
-    And I should see "PAID" in the "Status" dropdown
+    And I switch to the "Item page"
+    And I set the "Item Order ID" to "1"
+    And I press the "List Item" button
+    Then I should see the Item message "Success"
+    And I should not see "4321" in the Item results    
+    When I press the "Clear Item" button
+    And I set the "Item Order ID" to "1"
+    And I set the "Product ID" to "4321"
+    And I set the "Quantity" to "200"
+    And I set the "Price" to "10"
+    And I press the "Create Item" button
+    Then I should see the Item message "Success"
+    When I copy the "Item ID" field
+    And I press the "Clear Item" button
+    Then the "Item Order ID" field should be empty
+    And the "Product ID" field should be empty
+    And the "Quantity" field should be empty
+    And the "Price" field should be empty
+    When I paste the "Item ID" field
+    And I set the "Item Order ID" to "1"
+    And I press the "Retrieve Item" button
+    Then I should see "1" in the "Item Order ID" field
+    And I should see "4321" in the "Product ID" field
+    And I should see "200" in the "Quantity" field
+    And I should see "10" in the "Price" field
 
 Scenario: Delete an Order
     When I visit the "Home Page"
@@ -161,3 +164,27 @@ Scenario: Query orders by Status
     And I should see "4666" in the results
     And I should see "0" in the results
     And I should not see "404 Not Found"
+
+Scenario: Create a new Order
+    When I visit the "Home Page"
+    And I check the "Customer ID" in the "Query" Area
+    And I set the "query" to "1234"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should not see "1234" in the results    
+    When I press the "Clear" button
+    And I set the "Customer ID" to "1234"
+    And I set the "Tracking ID" to "0"
+    And I select "PAID" in the "Status" dropdown
+    And I press the "Create" button
+    Then I should see the message "Success"
+    When I copy the "Order ID" field
+    And I press the "Clear" button
+    Then the "Order ID" field should be empty
+    And the "Customer ID" field should be empty
+    And the "Tracking ID" field should be empty
+    When I paste the "Order ID" field
+    And I press the "Retrieve" button
+    Then I should see "1234" in the "Customer ID" field
+    And I should see "0" in the "Tracking ID" field
+    And I should see "PAID" in the "Status" dropdown

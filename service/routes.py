@@ -18,8 +18,8 @@ delete_items  DELETE   /orders/<int:order_id>/items/<int:item_id>
 """
 
 from flask import jsonify, make_response
-from service.models import Order, Item, OrderStatus
 from flask_restx import Resource, fields, reqparse
+from service.models import Order, Item, OrderStatus
 from .utils import status  # HTTP Status CodesS
 
 # Import Flask application

@@ -370,7 +370,7 @@ class ItemResource(Resource):
 ######################################################################
 @api.route('/orders/<int:order_id>/items', strict_slashes=False)
 class ItemCollection(Resource):
-    """ Handles all interactions with collections of Items """
+    """ Handles all interactions with collections of Items under one specific """
     # ------------------------------------------------------------------
     # LIST ITEMS FOR AN ORDER
     # ------------------------------------------------------------------
@@ -418,6 +418,28 @@ class ItemCollection(Resource):
         order.order_items.append(item)
         order.update()
         return item.serialize(), status.HTTP_201_CREATED
+
+
+######################################################################
+#  PATH: /items
+######################################################################
+@api.route('/items', strict_slashes=False)
+class AllItemCollection(Resource):
+    """ Handles all interactions with collections of ALL Items """
+    # ------------------------------------------------------------------
+    # LIST ALL ITEMS FOR AN ORDER
+    # ------------------------------------------------------------------
+    @api.doc('list_all_items')
+    @api.response(404, 'No Item found')
+    @api.marshal_list_with(item_model)
+    def get(self):
+        """Returns all of the Items for an order"""
+        app.logger.info("Request for all Items")
+        all_items = Item.all()
+
+        results = [Item.serialize(item) for item in all_items]
+        app.logger.info("[%s] Items returned", len(results))
+        return results, status.HTTP_200_OK
 
 
 ######################################################################

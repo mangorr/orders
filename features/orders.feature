@@ -16,6 +16,7 @@ Background:
        | 0           | 6447        | 6            | 32      |
        | 0           | 2343        | 1            | 16      |
        | 2           | 5354        | 5            | 21      |
+       | 2           | 9819        | 20           | 1024    |
 
 Scenario: The server is running
     When I visit the "Home Page"
@@ -216,7 +217,7 @@ Scenario: Delete an Item of an order
     When I set the "Item Order ID" to "3"
     And I press the "List Item" button
     Then I should see the Item message "Success"
-    And I should see "6" in the "Item ID" field
+    And I should see "4" in the "Item ID" field
 
 Scenario: Read an Item of an Order
     When I visit the "Home Page"
@@ -224,7 +225,7 @@ Scenario: Read an Item of an Order
     And I set the "Item Order ID" to "3"
     And I press the "List Item" button
     Then I should see the Item message "Success"
-    And I should see "6" in the "Item ID" field
+    And I should see "3" in the "Item ID" field
     And I should see "3" in the "Item Order ID" field
     When I copy the "Item ID" field
     And I press the "Clear Item" button
@@ -245,7 +246,6 @@ Scenario: List all Items of an Order
     Then I should see the Item message "Success"
     And I should see "6447" in the Item results
     And I should see "2343" in the Item results
-    And I should see "4321" in the Item results
     And I should not see "5354" in the Item results
 
 Scenario: Update an Item of an Order
@@ -254,7 +254,7 @@ Scenario: Update an Item of an Order
     And I set the "Item Order ID" to "3"
     And I press the "List Item" button
     Then I should see the Item message "Success"
-    And I should see "6" in the "Item ID" field
+    And I should see "3" in the "Item ID" field
     And I should see "3" in the "Item Order ID" field
     When I change "Quantity" to "10001"
     And I change "Price" to "0.5"

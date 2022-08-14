@@ -19,6 +19,7 @@ from tests.factories import OrderFactory, ItemFactory
 from service.utils import status  # HTTP Status Codes
 
 BASE_URL = "/api/orders"
+ALL_ITEM_URL = "/api/items"
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/postgres"
@@ -434,6 +435,48 @@ class Test(TestCase):
 
         data = resp.get_json()
         self.assertEqual(len(data), 2)
+
+    def test_all_item_list(self):
+        """It should Get a list of all Items"""
+        all_orders = self._create_orders(2)
+        # add two items to order 1
+        order = all_orders[0]
+        item_list = ItemFactory.create_batch(2)
+
+        # Create item 1
+        resp = self.app.post(
+            f"{BASE_URL}/{order.id}/items", json=item_list[0].serialize()
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # Create item 2
+        resp = self.app.post(
+            f"{BASE_URL}/{order.id}/items", json=item_list[1].serialize()
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # add two items to order 2
+        order = all_orders[1]
+        item_list = ItemFactory.create_batch(2)
+
+        # Create item 1
+        resp = self.app.post(
+            f"{BASE_URL}/{order.id}/items", json=item_list[0].serialize()
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # Create item 2
+        resp = self.app.post(
+            f"{BASE_URL}/{order.id}/items", json=item_list[1].serialize()
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # get the list back and make sure there are 2
+        resp = self.app.get(f"{ALL_ITEM_URL}")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        data = resp.get_json()
+        self.assertEqual(len(data), 4)
 
     def test_get_item_list_of_order_not_found(self):
         """It should not List Items of the order that is not found"""

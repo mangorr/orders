@@ -200,6 +200,7 @@ def step_impl(context, message):
             message
         )
     )
+    context.driver.save_screenshot('home_page.png')
     expect(found).to_be(True)
 
 ##################################################################

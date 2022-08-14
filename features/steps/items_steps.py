@@ -22,7 +22,7 @@ def step_impl(context):
     for row in context.table:
         order_id = context.order_ids[int(row["order_id_index"])]
         # rest_endpoint = f"{context.BASE_URL}/orders/{int(row['order_id'])}/items"
-        rest_endpoint = context.BASE_URL + "/orders/{}/items".format(order_id)
+        rest_endpoint = context.BASE_URL + "/api/orders/{}/items".format(order_id)
         # rest_endpoint = f"{context.BASE_URL}/orders/{int(order_id)}/items"
         payload = {
             "order_id": order_id,

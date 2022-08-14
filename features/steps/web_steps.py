@@ -38,9 +38,8 @@ BASE_URL = getenv('BASE_URL', 'http://localhost:8080/api')
 @when('I visit the "home page"')
 def step_impl(context):
     """ Make a call to the base URL """
-    context.driver.get(BASE_URL)
-    # context.driver.get("http://localhost:8080/")
-    
+    context.driver.get(BASE_URL.replace("api", ""))
+    # print("Visiting: " + BASE_URL)    
     # Uncomment next line to take a screenshot of the web page
     # context.driver.save_screenshot('home_page.png')
 

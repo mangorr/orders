@@ -18,6 +18,7 @@ from compare import expect
 @given(u'the following items')
 def step_impl(context):
     """ create new items """
+    context.driver.save_screenshot('item_step.png')
     headers = {'Content-Type': 'application/json'}
     for row in context.table:
         order_id = context.order_ids[int(row["order_id_index"])]

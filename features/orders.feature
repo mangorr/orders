@@ -148,7 +148,8 @@ Scenario: Query orders by customer ID
     And I should see "SHIPPED" in the results
     And I should see "SHIPPED" in the "Status" dropdown
     And I should not see "404 Not Found"
-    And I should not see "4666" in the results    And I should not see "2333" in the results
+    And I should not see "4666" in the results    
+    And I should not see "2333" in the results
     
 Scenario: Query orders by Status
     When I visit the "Home Page"

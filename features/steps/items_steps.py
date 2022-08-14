@@ -19,6 +19,15 @@ from compare import expect
 def step_impl(context):
     """ create new items """
     headers = {'Content-Type': 'application/json'}
+    context.resp = requests.get(
+        context.BASE_URL + '/api/items')
+    expect(context.resp.status_code).to_equal(200)
+
+    for item in context.resp.json():
+        context.resp = requests.delete(context.BASE_URL + '/api/orders/' + str(
+            item["order_id"]) + '/items/' + str(item["id"]), headers=headers)
+        expect(context.resp.status_code).to_equal(204)
+
     for row in context.table:
         order_id = context.order_ids[int(row["order_id_index"])]
         # rest_endpoint = f"{context.BASE_URL}/orders/{int(row['order_id'])}/items"

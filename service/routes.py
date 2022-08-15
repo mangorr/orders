@@ -44,28 +44,6 @@ def index():
     return app.send_static_file("index.html")
 
 
-create_order_model = api.model('Order', {
-    'customer_id': fields.Integer(required=True,
-                                  description='The Customer ID of the order'),
-    'tracking_id': fields.Integer(required=True,
-                                  description='The Tracking ID of the order'),
-    'status': fields. String(enum=OrderStatus._member_names_,
-                             description='The Status of the order'),
-})
-
-order_model = api.inherit(
-    'OrderModel',
-    create_order_model,
-    {
-        'id': fields.Integer(readOnly=True,
-                             description='The unique ID assigned internally by service'),
-        'created_time': fields.Date(required=True,
-                                    description='The Created Time of the order'),
-        'order_items': fields.Raw(required=True,
-                                  description='The Items of the order'),
-    }
-)
-
 create_item_model = api.model('Item', {
     'order_id': fields.Integer(required=True,
                                description='The Order ID of the item'),
@@ -83,6 +61,29 @@ item_model = api.inherit(
     {
         'id': fields.Integer(readOnly=True,
                              description='The unique ID assigned internally by service')
+    }
+)
+
+create_order_model = api.model('Order', {
+    'customer_id': fields.Integer(required=True,
+                                  description='The Customer ID of the order'),
+    'tracking_id': fields.Integer(required=True,
+                                  description='The Tracking ID of the order'),
+    'status': fields. String(enum=OrderStatus._member_names_,
+                             description='The Status of the order'),
+})
+
+order_model = api.inherit(
+    'OrderModel',
+    create_order_model,
+    {
+        'id': fields.Integer(readOnly=True,
+                             description='The unique ID assigned internally by service'),
+        'created_time': fields.Date(required=True,
+                                    description='The Created Time of the order'),
+        'order_items': fields.List(fields.Nested(create_item_model),
+                                   required=False,
+                                   description='The Items of the order'),
     }
 )
 
@@ -138,7 +139,7 @@ class OrderResource(Resource):
     @api.doc('update_orders')
     @api.response(404, 'Order not found')
     @api.response(400, 'The posted Order data was not valid')
-    @api.expect(order_model)
+    @api.expect(order_model, validate=True)
     @api.marshal_with(order_model)
     def put(self, order_id):
         """
@@ -219,7 +220,7 @@ class OrderCollection(Resource):
     # ------------------------------------------------------------------
     @api.doc('create_orders')
     @api.response(400, 'The posted data was not valid')
-    @api.expect(create_order_model)
+    @api.expect(create_order_model, validate=True)
     @api.marshal_with(order_model, code=201)
     def post(self):
         """
@@ -321,7 +322,7 @@ class ItemResource(Resource):
     @api.doc('update_items')
     @api.response(404, 'Item not found')
     @api.response(400, 'The posted Item data was not valid')
-    @api.expect(item_model)
+    @api.expect(item_model, validate=True)
     @api.marshal_with(item_model)
     def put(self, order_id, item_id):
         """
@@ -397,7 +398,7 @@ class ItemCollection(Resource):
     @api.doc('create_items')
     @api.response(400, 'The posted data was not valid')
     @api.response(404, 'Order not found')
-    @api.expect(create_item_model)
+    @api.expect(create_item_model, validate=True)
     @api.marshal_with(item_model, code=201)
     def post(self, order_id):
         """

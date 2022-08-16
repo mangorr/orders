@@ -147,11 +147,21 @@ class Test(TestCase):
 
     def test_update_order_not_found(self):
         """It should not Update an Order that is not found"""
-        order = OrderFactory()
+        # order = OrderFactory()
+        # print(type(order.id))
+        # print(type(order.customer_id))
+        # print(type(order.tracking_id))
+        # print(type(order.status))
+        # print(type(order.status))
+        order = {}
+        order["id"] = 1234
+        order["customer_id"] = 9999
+        order["tracking_id"] = 8888
+        order["status"] = OrderStatus.CANCELLED.name
         # order have not created yet
         resp = self.app.put(
-            f"{BASE_URL}/{order.id}",
-            json=order.serialize(),
+            f"{BASE_URL}/1234",
+            json=order,
             content_type="application/json",
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
@@ -358,6 +368,7 @@ class Test(TestCase):
         """It should Add an Item to an order"""
         order = self._create_orders(1)[0]
         item = ItemFactory()
+        item.order_id = order.id
         resp = self.app.post(
             f"{BASE_URL}/{order.id}/items",
             json=item.serialize(),
@@ -374,6 +385,7 @@ class Test(TestCase):
     def test_add_item_to_order_not_found(self):
         """It should not Add Items to the order that is not found"""
         item = ItemFactory()
+        item.order_id = 0
         resp = self.app.post(
             f"{BASE_URL}/0/items",
             json=item.serialize(),
@@ -386,6 +398,7 @@ class Test(TestCase):
         # create a known items
         order = self._create_orders(1)[0]
         item = ItemFactory()
+        item.order_id = order.id
         resp = self.app.post(
             f"{BASE_URL}/{order.id}/items",
             json=item.serialize(),
@@ -416,7 +429,8 @@ class Test(TestCase):
         # add two items to order
         order = self._create_orders(1)[0]
         item_list = ItemFactory.create_batch(2)
-
+        item_list[0].order_id = order.id
+        item_list[1].order_id = order.id
         # Create item 1
         resp = self.app.post(
             f"{BASE_URL}/{order.id}/items", json=item_list[0].serialize()
@@ -442,7 +456,8 @@ class Test(TestCase):
         # add two items to order 1
         order = all_orders[0]
         item_list = ItemFactory.create_batch(2)
-
+        item_list[0].order_id = order.id
+        item_list[1].order_id = order.id
         # Create item 1
         resp = self.app.post(
             f"{BASE_URL}/{order.id}/items", json=item_list[0].serialize()
@@ -458,7 +473,8 @@ class Test(TestCase):
         # add two items to order 2
         order = all_orders[1]
         item_list = ItemFactory.create_batch(2)
-
+        item_list[0].order_id = order.id
+        item_list[1].order_id = order.id
         # Create item 1
         resp = self.app.post(
             f"{BASE_URL}/{order.id}/items", json=item_list[0].serialize()
@@ -488,6 +504,7 @@ class Test(TestCase):
         # create a known item
         order = self._create_orders(1)[0]
         item = ItemFactory()
+        item.order_id = order.id
         resp = self.app.post(
             f"{BASE_URL}/{order.id}/items",
             json=item.serialize(),
@@ -530,11 +547,16 @@ class Test(TestCase):
     def test_update_item_not_found(self):
         """It should not Update an Item that is not found"""
         order = self._create_orders(1)[0]
-        item = ItemFactory()
+        data = {}
+        data["id"] = 10
+        data["order_id"] = order.id
+        data["product_id"] = 9999
+        data["quantity"] = 8888
+        data["price"] = 7777
         # item have not created yet
         resp = self.app.put(
-            f"{BASE_URL}/{order.id}/items/{item.id}",
-            json=order.serialize(),
+            f"{BASE_URL}/{order.id}/items/10",
+            json=data,
             content_type="application/json",
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
@@ -543,6 +565,7 @@ class Test(TestCase):
         """It should Delete an Item"""
         order = self._create_orders(1)[0]
         item = ItemFactory()
+        item.order_id = order.id
         resp = self.app.post(
             f"{BASE_URL}/{order.id}/items",
             json=item.serialize(),

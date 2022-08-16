@@ -45,8 +45,8 @@ $(function () {
         var status = $("#status").val();//== "CREATED";
 
         var data = {
-            "customer_id": customer_id,
-            "tracking_id": tracking_id,
+            "customer_id": parseInt(customer_id),
+            "tracking_id": parseInt(tracking_id),
             "status": status,
         };
 
@@ -82,9 +82,9 @@ $(function () {
         var status = $("#status").val();
 
         var data = {
-            "id": order_id,
-            "customer_id": customer_id,
-            "tracking_id": tracking_id,
+            "id": parseInt(order_id),
+            "customer_id": parseInt(customer_id),
+            "tracking_id": parseInt(tracking_id),
             "status": status
         };
 
@@ -245,10 +245,10 @@ $(function () {
         var price = $("#price").val();
 
         var data = {
-            "order_id": order_id,
-            "product_id": product_id,
-            "quantity": quantity,
-            "price": price
+            "order_id": parseInt(order_id),
+            "product_id": parseInt(product_id),
+            "quantity": parseInt(quantity),
+            "price": parseFloat(price)
         };
 
         var ajax = $.ajax({
@@ -283,11 +283,11 @@ $(function () {
         var price = $("#price").val();
 
         var data = {
-            "id": item_id,
-            "order_id": order_id,
-            "product_id": product_id,
-            "quantity": quantity,
-            "price": price,
+            "id": parseInt(item_id),
+            "order_id": parseInt(order_id),
+            "product_id": parseInt(product_id),
+            "quantity": parseInt(quantity),
+            "price": parseFloat(price),
         };
 
         var ajax = $.ajax({

@@ -6,8 +6,8 @@ metadata:
   labels:
     app: orders
 spec:
-  replicas: 2 # just one replicate set
-  # replicas: 1
+  # replicas: 2 # just one replicate set
+  replicas: 1
   selector:
     matchLabels:
       app: orders

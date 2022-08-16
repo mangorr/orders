@@ -382,13 +382,13 @@
         var ele = document.getElementsByName('query_option');
         var data={}
         if (ele[0].checked) {
-            data["customer_id"] = $("#query").val();
+            data["customer_id"] = parseInt($("#query").val());
             $("#search-btn-note").empty();
         }else if(ele[1].checked) {
             data["status"] = $("#query").val();
             $("#search-btn-note").empty();
         }else if(ele[2].checked){
-            data["product_id"] = $("#query").val();
+            data["product_id"] =parseInt($("#query").val());
             $("#search-btn-note").empty();
         }else{
             $("#search-btn-note").empty();
@@ -443,6 +443,7 @@
         }
         else{
           this.expand_row = [row['id']]
+          console.log(row.order_items)
           this.order_items = row.order_items
         }
       },

@@ -69,8 +69,8 @@ create_order_model = api.model('Order', {
                                   description='The Customer ID of the order'),
     'tracking_id': fields.Integer(required=True,
                                   description='The Tracking ID of the order'),
-    'status': fields. String(enum=OrderStatus._member_names_,
-                             description='The Status of the order'),
+    'status': fields.String(enum=OrderStatus._member_names_,
+                            description='The Status of the order'),
 })
 
 order_model = api.inherit(
@@ -79,9 +79,9 @@ order_model = api.inherit(
     {
         'id': fields.Integer(readOnly=True,
                              description='The unique ID assigned internally by service'),
-        'created_time': fields.Date(required=True,
+        'created_time': fields.Date(required=False,
                                     description='The Created Time of the order'),
-        'order_items': fields.List(fields.Nested(create_item_model),
+        'order_items': fields.List(fields.Nested(item_model),
                                    required=False,
                                    description='The Items of the order'),
     }
@@ -317,7 +317,7 @@ class ItemResource(Resource):
         return item.serialize(), status.HTTP_200_OK
 
     # ------------------------------------------------------------------
-    # UPDATE AN EXISTING ORDER
+    # UPDATE AN EXISTING ORDER'S ITEM
     # ------------------------------------------------------------------
     @api.doc('update_items')
     @api.response(404, 'Item not found')
@@ -346,7 +346,7 @@ class ItemResource(Resource):
         return item.serialize(), status.HTTP_200_OK
 
     # ------------------------------------------------------------------
-    # DELETE AN ORDER
+    # DELETE AN ITEM
     # ------------------------------------------------------------------
     @api.doc('delete_items')
     @api.response(204, 'Item deleted')

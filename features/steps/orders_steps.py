@@ -44,7 +44,7 @@ def step_impl(context):
     for row in context.table:
         payload = {
             "customer_id": int(row['customer_id']),
-            "tracking_id": row['tracking_id'],
+            "tracking_id": int(row['tracking_id']),
             "created_time": row['created_time'],
             "status": row['status'],
             "order_items": list()

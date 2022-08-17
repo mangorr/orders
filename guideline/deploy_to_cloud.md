@@ -1,4 +1,4 @@
-<h2>Deploy Service to IBM Cloud 2</h2>
+<h2>Deploy Service to IBM Cloud </h2>
 Start vscode and reopen in container
 
 ```

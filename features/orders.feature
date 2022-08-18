@@ -1,4 +1,4 @@
-Feature: The pet store service back-end
+Feature: The orders service back-end
     As an E-Commerce Store Owner
     I need a RESTful orders service
     So that I can manage all customer orders
@@ -16,6 +16,7 @@ Background:
        | 0           | 6447        | 6            | 32      |
        | 0           | 2343        | 1            | 16      |
        | 2           | 5354        | 5            | 21      |
+       | 2           | 9819        | 20           | 1024    |
 
 Scenario: The server is running
     When I visit the "Home Page"
@@ -46,22 +47,6 @@ Scenario: Create a new Order
     And I should see "0" in the "Tracking ID" field
     And I should see "PAID" in the "Status" dropdown
 
-Scenario: Delete an Order
-    When I visit the "Home Page"
-    And I check the "Customer ID" in the "Query" Area
-    And I set the "query" to "4666"
-    And I press the "Search" button
-    Then I should see the message "Success"
-    And I should see "0" in the "Tracking ID" field
-    And I should see "PLACED" in the "Status" dropdown
-    When I press the "Delete" button
-    Then I should see the message "Order has been Deleted!"
-    When I check the "Customer ID" in the "Query" Area
-    And I set the "query" to "4666"
-    And I press the "Search" button
-    Then I should see the message "Success"
-    And I should not see "4666" in the results
-
 Scenario: Read an Order
     When I visit the "Home Page"
     And I check the "Customer ID" in the "Query" Area
@@ -79,42 +64,6 @@ Scenario: Read an Order
     And I should see "PLACED" in the "Status" dropdown
     And I should see "4666" in the "Customer ID" field
     And I should not see "404 Not Found"
-
-Scenario: Cancel an order
-    When I visit the "Home Page"
-    And I check the "Customer ID" in the "Query" Area
-    And I set the "query" to "7479"
-    And I press the "Search" button
-    Then I should see the message "Success"
-    And I should see "0" in the "Tracking ID" field
-    And I should see "PLACED" in the "Status" dropdown
-    When I press the "Cancel" button
-    Then I should see the message "Order has been CANCELLED!"
-    When I check the "Customer ID" in the "Query" Area
-    And I set the "query" to "7479"
-    And I press the "Search" button
-    Then I should see the message "Success"
-    And I should see "CANCELLED" in the "Status" dropdown
-
-Scenario: List all orders
-    When I visit the "Home Page"
-    And I press the "List" button
-    Then I should see the message "Success"
-    And I should see "4774" in the results
-    And I should see "4798" in the results
-    And I should see "SHIPPED" in the results
-    And I should see "2333" in the results
-    And I should see "0" in the results
-    And I should see "PLACED" in the results
-    And I should see "9898" in the results
-    And I should see "3434" in the results
-    And I should see "DELIVERED" in the results
-    And I should see "7479" in the results
-    And I should see "0" in the results
-    And I should see "PLACED" in the results
-    And I should not see "989877" in the results
-    And I should not see "343434" in the results
-    And I should not see "CANCELLED" in the results
 
 Scenario: Update a Order
     When I visit the "Home Page"
@@ -137,6 +86,58 @@ Scenario: Update a Order
     And I press the "List" button
     Then I should see "556612" in the results
 
+Scenario: Delete an Order
+    When I visit the "Home Page"
+    And I check the "Customer ID" in the "Query" Area
+    And I set the "query" to "4666"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "0" in the "Tracking ID" field
+    And I should see "PLACED" in the "Status" dropdown
+    When I press the "Delete" button
+    Then I should see the message "Order has been Deleted!"
+    When I check the "Customer ID" in the "Query" Area
+    And I set the "query" to "4666"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should not see "4666" in the results
+
+Scenario: List all orders
+    When I visit the "Home Page"
+    And I press the "List" button
+    Then I should see the message "Success"
+    And I should see "4774" in the results
+    And I should see "4798" in the results
+    And I should see "SHIPPED" in the results
+    And I should see "2333" in the results
+    And I should see "0" in the results
+    And I should see "PLACED" in the results
+    And I should see "9898" in the results
+    And I should see "3434" in the results
+    And I should see "DELIVERED" in the results
+    And I should see "7479" in the results
+    And I should see "0" in the results
+    And I should see "PLACED" in the results
+    And I should not see "989877" in the results
+    And I should not see "343434" in the results
+    And I should not see "CANCELLED" in the results
+
+Scenario: Cancel an order
+    When I visit the "Home Page"
+    And I check the "Customer ID" in the "Query" Area
+    And I set the "query" to "7479"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "0" in the "Tracking ID" field
+    And I should see "PLACED" in the "Status" dropdown
+    When I press the "Cancel" button
+    Then I should see the message "Order has been CANCELLED!"
+    When I check the "Customer ID" in the "Query" Area
+    And I set the "query" to "7479"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "CANCELLED" in the "Status" dropdown
+
 Scenario: Query orders by customer ID
     When I visit the "Home Page"
     And I check the "Customer ID" in the "Query" Area
@@ -148,7 +149,8 @@ Scenario: Query orders by customer ID
     And I should see "SHIPPED" in the results
     And I should see "SHIPPED" in the "Status" dropdown
     And I should not see "404 Not Found"
-    And I should not see "4666" in the results    And I should not see "2333" in the results
+    And I should not see "4666" in the results    
+    And I should not see "2333" in the results
     
 Scenario: Query orders by Status
     When I visit the "Home Page"
@@ -200,30 +202,13 @@ Scenario: Create a new Item
     And I should see "200" in the "Quantity" field
     And I should see "10" in the "Price" field
 
-Scenario: Delete an Item of an order
-    When I visit the "Home Page"
-    And I switch to the "Item page"
-    And I set the "Item Order ID" to "3"
-    And I press the "List Item" button
-    Then I should see the Item message "Success"
-    And I should see "5354" in the Item results
-    And I should see "5" in the Item results
-    And I should see "21" in the Item results
-    And I should see "3" in the "Item ID" field
-    When I press the "Delete Item" button
-    Then I should see the Item message "Item has been Deleted!"
-    When I set the "Item Order ID" to "3"
-    And I press the "List Item" button
-    Then I should see the Item message "Success"
-    And I should see "6" in the "Item ID" field
-
 Scenario: Read an Item of an Order
     When I visit the "Home Page"
     And I switch to the "Item page"
     And I set the "Item Order ID" to "3"
     And I press the "List Item" button
     Then I should see the Item message "Success"
-    And I should see "6" in the "Item ID" field
+    And I should see "3" in the "Item ID" field
     And I should see "3" in the "Item Order ID" field
     When I copy the "Item ID" field
     And I press the "Clear Item" button
@@ -236,24 +221,13 @@ Scenario: Read an Item of an Order
     And I should see "21" in the "Price" field
     And I should not see "404 Not Found"
 
-Scenario: List all Items of an Order
-    When I visit the "Home Page"
-    And I switch to the "Item page"
-    And I set the "Item Order ID" to "1"
-    And I press the "List Item" button
-    Then I should see the Item message "Success"
-    And I should see "6447" in the Item results
-    And I should see "2343" in the Item results
-    And I should see "4321" in the Item results
-    And I should not see "5354" in the Item results
-
 Scenario: Update an Item of an Order
     When I visit the "Home Page"
     And I switch to the "Item page"
     And I set the "Item Order ID" to "3"
     And I press the "List Item" button
     Then I should see the Item message "Success"
-    And I should see "6" in the "Item ID" field
+    And I should see "3" in the "Item ID" field
     And I should see "3" in the "Item Order ID" field
     When I change "Quantity" to "10001"
     And I change "Price" to "0.5"
@@ -273,3 +247,29 @@ Scenario: Update an Item of an Order
     And I press the "List Item" button
     Then I should see "0.5" in the Item results
     
+Scenario: Delete an Item of an order
+    When I visit the "Home Page"
+    And I switch to the "Item page"
+    And I set the "Item Order ID" to "3"
+    And I press the "List Item" button
+    Then I should see the Item message "Success"
+    And I should see "5354" in the Item results
+    And I should see "5" in the Item results
+    And I should see "21" in the Item results
+    And I should see "3" in the "Item ID" field
+    When I press the "Delete Item" button
+    Then I should see the Item message "Item has been Deleted!"
+    When I set the "Item Order ID" to "3"
+    And I press the "List Item" button
+    Then I should see the Item message "Success"
+    And I should see "4" in the "Item ID" field
+
+Scenario: List all Items of an Order
+    When I visit the "Home Page"
+    And I switch to the "Item page"
+    And I set the "Item Order ID" to "1"
+    And I press the "List Item" button
+    Then I should see the Item message "Success"
+    And I should see "6447" in the Item results
+    And I should see "2343" in the Item results
+    And I should not see "5354" in the Item results

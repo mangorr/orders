@@ -33,7 +33,7 @@ def step_impl(context):
     """ Delete all Orders and load new ones """
     # List all of the pets and delete them one by one
     context.order_ids = list()
-    rest_endpoint = f"{context.BASE_URL}/orders"
+    rest_endpoint = f"{context.BASE_URL}/api/orders"
     context.resp = requests.get(rest_endpoint)
     expect(context.resp.status_code).to_equal(200)
     for order in context.resp.json():
@@ -44,7 +44,7 @@ def step_impl(context):
     for row in context.table:
         payload = {
             "customer_id": int(row['customer_id']),
-            "tracking_id": row['tracking_id'],
+            "tracking_id": int(row['tracking_id']),
             "created_time": row['created_time'],
             "status": row['status'],
             "order_items": list()

@@ -358,7 +358,7 @@
         ajax.done(function (res) {
             that.list_all = res
             var well_container = document.getElementById("well-container")
-            well_container.style.height="150vh"
+            well_container.style.height="160vh"
             var result_container = document.getElementById("search_results")
             result_container.style.display = "block";
             $("#flash_message").val("Success");
@@ -382,13 +382,13 @@
         var ele = document.getElementsByName('query_option');
         var data={}
         if (ele[0].checked) {
-            data["customer_id"] = $("#query").val();
+            data["customer_id"] = parseInt($("#query").val());
             $("#search-btn-note").empty();
         }else if(ele[1].checked) {
             data["status"] = $("#query").val();
             $("#search-btn-note").empty();
         }else if(ele[2].checked){
-            data["product_id"] = $("#query").val();
+            data["product_id"] =parseInt($("#query").val());
             $("#search-btn-note").empty();
         }else{
             $("#search-btn-note").empty();
@@ -408,7 +408,7 @@
         ajax.done(function (res) {
             that.list_all = res
             var well_container = document.getElementById("well-container")
-            well_container.style.height="150vh"
+            well_container.style.height="160vh"
             var result_container = document.getElementById("search_results")
             result_container.style.display = "block";
             $("#flash_message").val("Success");
